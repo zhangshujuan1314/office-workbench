@@ -403,6 +403,8 @@
 .ai-status.ok{background:#E8F5EC;color:#2D6A3F;}
 .ai-status.err{background:var(--danger-bg);color:var(--danger);}
 .modal .ai-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
+.flow-chart{background:#FAF9F5;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;overflow-x:auto;}
+.flow-chart svg{display:block;margin:0 auto;min-width:220px;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -488,6 +490,10 @@
       <button class="nav-item" onclick="openAISettings()">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3H5a2 2 0 0 0 0 4 2 2 0 0 0 0 4 2 2 0 0 0 0 4h1a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3h1a2 2 0 0 0 0-4 2 2 0 0 0 0-4 2 2 0 0 0 0-4h-1a3 3 0 0 0-3-3V5a3 3 0 0 0-3-3zM9 12h6M9 8h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         AI 设置
+      </button>
+      <button class="nav-item" onclick="openBrainstorm()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9.663 17h4.673M12 3v1M3 12h1M20 12h1M5.6 5.6l.7.7M18.4 5.6l-.7.7M12 18a6 6 0 0 0 9-5 6 6 0 0 0-9-5 6 6 0 0 0-9 5 6 6 0 0 0 9 5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        AI 头脑风暴
       </button>
       <button class="nav-item" onclick="confirmClearAll()" style="color:var(--danger);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -601,6 +607,7 @@
           <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 每周复盘</h2>
           <div class="section-desc">本周一到今天 · 完成数 / 优先级分布 / 精力分布 / 卡点汇总</div>
         </div>
+        <button class="btn btn-primary" onclick="reviewInsight()" id="aiReviewBtn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>AI 洞察</button>
       </div>
       <div id="reviewContent"></div>
     </section>
@@ -908,6 +915,9 @@ function renderTodos(){
           </div>
         </div>
         <div class="todo-actions">
+          <button class="btn-icon btn-ghost" title="AI 拆解" onclick="splitTodo('${t.id}')" id="aiTodo-${t.id}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
           <button class="btn-icon btn-ghost" title="顺延到明天" onclick="postponeTodo('${t.id}',1)">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
@@ -1460,6 +1470,97 @@ async function suggestProject(id){
   runAI('项目卡点建议','你是一位资深项目管理顾问。请针对以下项目卡点给出突破建议。\n\n项目：'+p.name+'\n当前阶段：'+(p.stage||'未指定')+'\n卡点：'+p.blocker+'\n下一步计划：'+(p.nextStep||'未指定')+'\n\n请给 3-5 条可立即执行的建议，每条含：动作 + 预期效果。简短分点，400字以内。','aiProj-'+p.id,function(txt,html){
     showAIResult('项目卡点建议',html);
   });
+}
+
+/* 待办 AI 拆解 */
+async function splitTodo(id){
+  const t=data.todos.find(function(x){return x.id===id;});
+  if(!t) return;
+  window._aiCtx={type:'todo',todo:t};
+  runAI('任务拆解','你是任务拆解专家。把下面这条任务拆成 3-6 条可独立执行的子任务，每条一行，格式「- 子任务内容」。子任务要具体、可勾选完成。不要额外解释。\n\n任务：'+t.title,'aiTodo-'+id,function(txt,html){
+    window._aiResult=txt;
+    showAIResult('任务拆解',html,[{label:'一键添加全部子任务',cls:'btn-primary',onclick:'saveAIAsTodos'}]);
+  });
+}
+function saveAIAsTodos(){
+  const ctx=window._aiCtx;
+  const txt=window._aiResult||'';
+  if(!ctx){closeModal();return;}
+  const lines=txt.split('\n').map(function(l){return l.replace(/^[-•\d.\s\)]+/,'').trim();}).filter(function(l){return l.length>0;});
+  if(!lines.length){closeModal();toast('未解析到子任务','error');return;}
+  const base=ctx.todo;
+  lines.forEach(function(sub){
+    data.todos.unshift({id:uid(),title:sub,priority:base.priority,dueDate:base.dueDate,completed:false,projectId:base.projectId,postponeCount:0,createdAt:Date.now()});
+  });
+  save();renderAll();closeModal();toast('已添加 '+lines.length+' 条子任务','success');
+}
+/* 复盘 AI 洞察 */
+async function reviewInsight(){
+  const now=new Date();
+  const dow=(now.getDay()+6)%7;
+  const monday=new Date(now);monday.setDate(now.getDate()-dow);monday.setHours(0,0,0,0);
+  const weekDone=data.todos.filter(function(t){return t.completed&&t.completedDate&&t.completedDate>=monday.getTime();});
+  const pCount={P0:0,P1:0,P2:0,P3:0};
+  weekDone.forEach(function(t){pCount[t.priority]=(pCount[t.priority]||0)+1;});
+  const projEffort={};
+  weekDone.forEach(function(t){if(t.projectId){var p=data.projects.find(function(x){return x.id===t.projectId;});if(p)projEffort[p.name]=(projEffort[p.name]||0)+1;}});
+  var blockers=data.projects.filter(function(p){return p.blocker&&p.blocker.trim();}).map(function(p){return p.name+'：'+p.blocker;}).join('；')||'无';
+  var pending=data.todos.filter(function(t){return !t.completed;}).length;
+  var summary='本周完成 '+weekDone.length+' 件（P0:'+pCount.P0+'，P1:'+pCount.P1+'，P2:'+pCount.P2+'，P3:'+pCount.P3+'）。\n精力分布：'+Object.keys(projEffort).map(function(k){return k+projEffort[k]+'件';}).join('，')+'；独立任务'+weekDone.filter(function(t){return !t.projectId;}).length+'件。\n当前卡点：'+blockers+'\n待办剩余：'+pending+'件。';
+  runAI('复盘洞察','你是资深项目管理顾问。根据以下本周复盘数据，给出 3-5 条洞察：① 做得好的 ② 需要改进的 ③ 下周建议聚焦什么。简短分点，400字以内。\n\n'+summary,'aiReviewBtn',function(txt,html){
+    showAIResult('复盘洞察',html);
+  });
+}
+/* AI 头脑风暴 + 流程图 */
+function openBrainstorm(){
+  showModal('<h3>AI 头脑风暴</h3>'+
+  '<p>输入一个主题，AI 围绕它发散想法 + 画出流程步骤图。</p>'+
+  '<div class="form-field" style="margin-bottom:10px;"><label>主题</label><input type="text" id="bsTopic" placeholder="例如：如何提升团队周会效率"></div>'+
+  '<div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-primary" onclick="runBrainstorm()">开始头脑风暴</button></div>');
+}
+async function runBrainstorm(){
+  const topic=document.getElementById('bsTopic').value.trim();
+  if(!topic){toast('请输入主题','error');return;}
+  closeModal();
+  window._aiCtx={type:'brainstorm',topic:topic};
+  runAI('头脑风暴：'+topic,'你是创意顾问+流程设计专家。围绕主题「'+topic+'」做头脑风暴，严格按以下格式输出，不要额外解释：\n\n【思路】\n- 想法1\n- 想法2\n- 想法3\n（3-5条发散想法）\n\n【流程步骤】\n步骤1: 内容\n步骤2: 内容\n步骤3: 内容\n（3-6步可执行流程）',null,function(txt,html){
+    window._aiResult=txt;
+    var steps=[];
+    var m=txt.match(/【流程步骤】([\s\S]*?)$/);
+    if(m){
+      steps=m[1].split('\n').map(function(l){return l.replace(/^步骤\d+\s*[:：]\s*/,'').trim();}).filter(function(l){return l.length>0;});
+    }
+    var flowHtml='';
+    if(steps.length){flowHtml='<div class="flow-chart">'+renderFlowChart(steps)+'</div>';}
+    showAIResult('头脑风暴：'+topic,html+flowHtml,[{label:'存为灵感',cls:'btn-primary',onclick:'saveBrainstormAsInsp'}]);
+  });
+}
+function renderFlowChart(steps){
+  var n=steps.length;
+  if(!n) return '';
+  var w=260,boxH=40,gap=14,h=n*(boxH+gap)+6;
+  var cx=w/2;
+  var svg='<svg viewBox="0 0 '+w+' '+h+'" style="max-width:100%;height:auto;">';
+  for(var i=0;i<n;i++){
+    var y=i*(boxH+gap)+5;
+    var txt=escapeHtml(steps[i].length>16?steps[i].slice(0,15)+'…':steps[i]);
+    svg+='<rect x="20" y="'+y+'" width="'+(w-40)+'" height="'+boxH+'" rx="8" fill="#FAF0E8" stroke="#D97757" stroke-width="1.5"/>';
+    svg+='<text x="'+cx+'" y="'+(y+boxH/2+5)+'" text-anchor="middle" font-size="12" fill="#1A1A1A" font-weight="500">'+txt+'</text>';
+    if(i<n-1){
+      var ay=y+boxH,by=y+boxH+gap;
+      svg+='<line x1="'+cx+'" y1="'+ay+'" x2="'+cx+'" y2="'+by+'" stroke="#D97757" stroke-width="1.5" stroke-linecap="round"/>';
+      svg+='<path d="M'+(cx-4)+' '+(by-4)+' L'+cx+' '+by+' L'+(cx+4)+' '+(by-4)+'" fill="none" stroke="#D97757" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    }
+  }
+  svg+='</svg>';
+  return svg;
+}
+function saveBrainstormAsInsp(){
+  const ctx=window._aiCtx;
+  const txt=window._aiResult||'';
+  if(!ctx){closeModal();return;}
+  data.inspirations.unshift({id:uid(),content:'【头脑风暴·'+ctx.topic+'】\n'+txt,tags:['头脑风暴'],createdAt:Date.now()});
+  save();renderAll();closeModal();toast('已存为灵感','success');
 }
 
 function init(){
