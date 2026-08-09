@@ -229,6 +229,7 @@
   .proj-link{font-size:11.5px;color:var(--accent);background:#FAF0E8;padding:1px 7px;border-radius:5px;}
   .todo-actions{display:flex;gap:4px;flex-shrink:0;}
   .todo-empty{text-align:center;color:var(--muted);font-size:13px;padding:24px;}
+  .empty-illu{margin:0 auto 12px;width:110px;height:90px;opacity:.92;}
 
   /* ===== Inspiration ===== */
   .insp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
@@ -907,7 +908,7 @@ function renderTodos(){
   }
 
   if(html===''){
-    html = '<div class="card todo-empty">还没有任务，添加第一条待办开始吧 ✎</div>';
+    html = '<div class="card todo-empty"><div class="empty-illu"><svg viewBox="0 0 120 100" width="120" height="100" fill="none"><rect x="30" y="20" width="60" height="68" rx="8" fill="#FAF0E8" stroke="#D97757" stroke-width="2"/><rect x="46" y="14" width="28" height="12" rx="4" fill="#D97757"/><circle cx="42" cy="42" r="3.5" fill="#B89968"/><line x1="50" y1="42" x2="78" y2="42" stroke="#B89968" stroke-width="2.5" stroke-linecap="round"/><circle cx="42" cy="58" r="3.5" fill="#4A7C59"/><path d="M50 58 l4 4 l8 -10" stroke="#4A7C59" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/><circle cx="42" cy="74" r="3.5" fill="#B89968"/><line x1="50" y1="74" x2="70" y2="74" stroke="#B89968" stroke-width="2.5" stroke-linecap="round"/></svg></div>还没有任务，添加第一条待办开始吧 ✎</div>';
   }
   container.innerHTML = html;
 }
@@ -948,7 +949,7 @@ function renderInspirations(){
   const list = document.getElementById('inspList');
   const items = data.inspirations.filter(i=>!currentTagFilter || (i.tags||[]).includes(currentTagFilter));
   if(items.length===0){
-    list.innerHTML = '<div class="card todo-empty" style="grid-column:1/-1;">还没有灵感，随手记下第一个想法吧 ✎</div>';
+    list.innerHTML = '<div class="card todo-empty" style="grid-column:1/-1;"><div class="empty-illu"><svg viewBox="0 0 120 100" width="120" height="100" fill="none"><line x1="60" y1="8" x2="60" y2="18" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/><line x1="34" y1="18" x2="40" y2="26" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/><line x1="86" y1="18" x2="80" y2="26" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/><line x1="20" y1="44" x2="30" y2="44" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/><line x1="90" y1="44" x2="100" y2="44" stroke="#D97757" stroke-width="2.5" stroke-linecap="round"/><path d="M60 24 a20 20 0 0 1 13 35 l0 8 l-26 0 l0 -8 a20 20 0 0 1 13 -35 z" fill="#FAF0E8" stroke="#D97757" stroke-width="2"/><line x1="49" y1="72" x2="71" y2="72" stroke="#B85842" stroke-width="2.5" stroke-linecap="round"/><line x1="51" y1="80" x2="69" y2="80" stroke="#B85842" stroke-width="2.5" stroke-linecap="round"/><path d="M53 52 l4 4 l8 -10" stroke="#D97757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>还没有灵感，随手记下第一个想法吧 ✎</div>';
     return;
   }
   list.innerHTML = items.map(i=>{
@@ -1017,7 +1018,7 @@ function deleteProject(id){
 function renderProjects(){
   const list = document.getElementById('projList');
   if(data.projects.length===0){
-    list.innerHTML = '<div class="card todo-empty">还没有项目，点击右上角「新建项目」开始跟进 ✎</div>';
+    list.innerHTML = '<div class="card todo-empty"><div class="empty-illu"><svg viewBox="0 0 120 100" width="120" height="100" fill="none"><path d="M20 40 l24 0 l8 8 l48 0 0 36 l-80 0 z" fill="#FAF0E8" stroke="#D97757" stroke-width="2" stroke-linejoin="round"/><line x1="62" y1="22" x2="62" y2="64" stroke="#B85842" stroke-width="2.5" stroke-linecap="round"/><path d="M62 24 l20 6 l-20 6 z" fill="#D97757"/><circle cx="62" cy="64" r="3" fill="#B85842"/><line x1="32" y1="58" x2="54" y2="58" stroke="#B89968" stroke-width="2" stroke-linecap="round"/><line x1="32" y1="68" x2="50" y2="68" stroke="#B89968" stroke-width="2" stroke-linecap="round"/></svg></div>还没有项目，点击右上角「新建项目」开始跟进 ✎</div>';
     return;
   }
   list.innerHTML = data.projects.map(p=>{
