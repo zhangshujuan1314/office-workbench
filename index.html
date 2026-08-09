@@ -1375,38 +1375,43 @@ function saveAIConfig(cfg){localStorage.setItem(AI_KEY,JSON.stringify(cfg));}
 function openAISettings(){
   const cfg=loadAIConfig();
   showModal('<h3>AI 助手设置</h3>'+
-  '<p>填入 DeepSeek API key 后，灵感扩展 / 项目卡点建议 / 待办拆解 / 复盘洞察 等 AI 功能可用。key 只存你浏览器本地，不上传服务器。</p>'+
+  '<p>填入 API Base + API Key + 模型名，AI 功能可用。兼容 OpenAI 格式的中转 API 也可填。配置只存浏览器本地，不上传。</p>'+
+  '<div class="form-field" style="margin-bottom:10px;"><label>API Base</label><input type="text" id="aiBase" value="'+escapeAttr(cfg.base||'https://api.deepseek.com/v1')+'" placeholder="https://api.deepseek.com/v1"></div>'+
   '<div class="form-field" style="margin-bottom:10px;"><label>API Key</label><input type="password" id="aiKey" value="'+escapeAttr(cfg.key||'')+'" placeholder="sk-..."></div>'+
-  '<div class="form-field" style="margin-bottom:10px;"><label>模型</label><select id="aiModel"><option value="deepseek-chat" '+(cfg.model==='deepseek-chat'?'selected':'')+'>deepseek-chat（快，日常用）</option><option value="deepseek-reasoner" '+(cfg.model==='deepseek-reasoner'?'selected':'')+'>deepseek-reasoner（推理强，较慢）</option></select></div>'+
+  '<div class="form-field" style="margin-bottom:10px;"><label>模型名</label><input type="text" id="aiModel" value="'+escapeAttr(cfg.model||'deepseek-v4-flash')+'" placeholder="deepseek-v4-flash"></div>'+
   '<div class="ai-status" id="aiStatus"></div>'+
   '<div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-ghost" onclick="testAIConn()">测试连接</button><button class="btn btn-primary" onclick="saveAIConfigAndClose()">保存</button></div>'+
-  '<div class="ai-note">没有 key？去 platform.deepseek.com 注册（微信扫码登录），在「API keys」创建。新用户有免费额度。<br>提示：key 在浏览器 devtools 可见，单用户自用可接受，请勿在公共电脑保存。</div>');
+  '<div class="ai-note">官方 DeepSeek：base https://api.deepseek.com/v1，模型 deepseek-chat / deepseek-reasoner<br>中转 API：填中转 base + 对应模型名（如 deepseek-v4-flash）<br>注意：中转服务器需允许 CORS（Access-Control-Allow-Origin 含 github.io），否则浏览器直调会失败<br>key 在 devtools 可见，单用户自用可接受，勿在公共电脑保存。</div>');
 }
 function saveAIConfigAndClose(){
+  const base=document.getElementById('aiBase').value.trim()||'https://api.deepseek.com/v1';
   const key=document.getElementById('aiKey').value.trim();
-  const model=document.getElementById('aiModel').value;
-  saveAIConfig({key,model});
+  const model=document.getElementById('aiModel').value.trim()||'deepseek-v4-flash';
+  saveAIConfig({base,key,model});
   closeModal();
   toast('AI 设置已保存','success');
 }
 async function testAIConn(){
+  const base=document.getElementById('aiBase').value.trim()||'https://api.deepseek.com/v1';
   const key=document.getElementById('aiKey').value.trim();
-  const model=document.getElementById('aiModel').value;
+  const model=document.getElementById('aiModel').value.trim()||'deepseek-v4-flash';
   const st=document.getElementById('aiStatus');
   if(!key){st.className='ai-status err show';st.textContent='请先填 key';return;}
   st.className='ai-status show';st.textContent='测试中…';
   try{
-    const r=await callDeepSeek([{role:'user',content:'回复 OK'}],{key,model});
+    const r=await callDeepSeek([{role:'user',content:'回复 OK'}],{base,key,model});
     st.className='ai-status ok show';st.textContent='✓ 连接成功：'+(r||'').slice(0,30);
   }catch(e){st.className='ai-status err show';st.textContent='✗ '+e.message;}
 }
 async function callDeepSeek(messages,overrideCfg){
   const cfg=overrideCfg||loadAIConfig();
   if(!cfg.key) throw new Error('未配置 API key，请先在「AI 设置」填写');
-  const r=await fetch('https://api.deepseek.com/v1/chat/completions',{
+  const base=(cfg.base||'https://api.deepseek.com/v1').replace(/\/+$/,'');
+  const model=cfg.model||'deepseek-v4-flash';
+  const r=await fetch(base+'/chat/completions',{
     method:'POST',
     headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.key},
-    body:JSON.stringify({model:cfg.model||'deepseek-chat',messages:messages,stream:false,temperature:0.7})
+    body:JSON.stringify({model:model,messages:messages,stream:false,temperature:0.7})
   });
   if(!r.ok){let t='';try{t=await r.text();}catch(e){}throw new Error('API '+r.status+': '+t.slice(0,150));}
   const d=await r.json();
