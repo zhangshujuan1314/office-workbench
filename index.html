@@ -405,6 +405,21 @@
 .modal .ai-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
 .flow-chart{background:#FAF9F5;border:1px solid var(--border);border-radius:10px;padding:14px;margin-top:14px;overflow-x:auto;}
 .flow-chart svg{display:block;margin:0 auto;min-width:220px;}
+.attachments{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.att-img{position:relative;width:58px;height:58px;border-radius:8px;overflow:hidden;border:1px solid var(--border);flex-shrink:0;}
+.att-img img{width:100%;height:100%;object-fit:cover;cursor:pointer;display:block;}
+.att-del{position:absolute;top:2px;right:2px;width:18px;height:18px;border-radius:4px;background:rgba(0,0,0,.55);color:#fff;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.att-del:hover{background:rgba(200,85,61,.9);}
+.att-file{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:5px 9px;background:var(--primary-light);border-radius:6px;color:var(--primary-dark);max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-decoration:none;}
+.att-file svg{width:13px;height:13px;flex-shrink:0;}
+.att-upload{margin-top:8px;display:flex;align-items:center;flex-wrap:wrap;gap:6px;}
+.att-upload-btn{font-size:11px;padding:5px 10px;border-radius:6px;border:1px dashed var(--border);background:#fff;color:var(--muted);cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
+.att-upload-btn:hover{border-color:var(--primary);color:var(--primary-dark);background:var(--primary-light);}
+.att-upload-btn svg{width:12px;height:12px;}
+.att-upload-hint{font-size:10px;color:var(--muted);}
+.att-preview-mask{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;cursor:pointer;}
+.att-preview-mask.show{display:flex;}
+.att-preview-mask img{max-width:92vw;max-height:88vh;border-radius:8px;box-shadow:0 8px 40px rgba(0,0,0,.5);}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -638,6 +653,7 @@
 <div class="modal-mask" id="modalMask">
   <div class="modal" id="modalBox"></div>
 </div>
+<div class="att-preview-mask" id="attPreviewMask" onclick="this.classList.remove('show')"><img src="" alt=""></div>
 
 <div class="toast" id="toast"></div>
 
@@ -925,6 +941,8 @@ function renderTodos(){
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
         </div>
+        ${renderAttachments('todo',t.id)}
+        ${attUploadHtml('todo',t.id)}
       </div>`;
     });
     html += '</div>';
@@ -1000,6 +1018,7 @@ function renderInspirations(){
       <button class="insp-del" onclick="deleteInspiration('${i.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="insp-content">${escapeHtml(i.content)}</div>
       ${i.tags && i.tags.length?`<div class="insp-tags">${i.tags.map(t=>`<span class="insp-tag" onclick="setTagFilter('${escapeAttr(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`:''}
+      ${renderAttachments('insp',i.id)}${attUploadHtml('insp',i.id)}
       <div class="insp-foot"><span>${fmtDateTime(i.createdAt)}</span><button class="ai-action-btn" id="aiInsp-${i.id}" onclick="expandInspiration('${i.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>AI 扩展</button></div>
     </div>`;
   }).join('');
@@ -1087,6 +1106,8 @@ function renderProjects(){
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
       </div>
       <div class="proj-actions">${blocked?`<button class="ai-action-btn" id="aiProj-${p.id}" onclick="suggestProject('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>AI 建议</button>`:''}</div>
+      ${renderAttachments('proj',p.id)}
+      ${attUploadHtml('proj',p.id)}
       ${total>0?`<div class="proj-todos">${linked.slice(0,5).map(t=>`<div class="proj-todo-mini ${t.completed?'done':''}"><span class="mini-check"></span><span>${escapeHtml(t.title)}</span></div>`).join('')}${total>5?`<div style="font-size:11px;color:var(--muted);padding:3px 0;">还有 ${total-5} 项…</div>`:''}</div>`:''}
     </div>`;
   }).join('');
@@ -1561,6 +1582,102 @@ function saveBrainstormAsInsp(){
   if(!ctx){closeModal();return;}
   data.inspirations.unshift({id:uid(),content:'【头脑风暴·'+ctx.topic+'】\n'+txt,tags:['头脑风暴'],createdAt:Date.now()});
   save();renderAll();closeModal();toast('已存为灵感','success');
+}
+
+/* ============ 附件（图片/文件）上传 ============ */
+function compressImage(file, cb){
+  if(!file.type.startsWith('image/')){cb(null);return;}
+  var reader=new FileReader();
+  reader.onload=function(){
+    var img=new Image();
+    img.onload=function(){
+      var w=img.width,h=img.height,maxW=800;
+      if(w>maxW){h=Math.round(h*maxW/w);w=maxW;}
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      try{c.getContext('2d').drawImage(img,0,0,w,h);cb(c.toDataURL('image/jpeg',0.72));}catch(e){cb(null);}
+    };
+    img.onerror=function(){cb(null);};
+    img.src=reader.result;
+  };
+  reader.onerror=function(){cb(null);};
+  reader.readAsDataURL(file);
+}
+function readFileBase64(file, cb){
+  var reader=new FileReader();
+  reader.onload=function(){cb(reader.result);};
+  reader.onerror=function(){cb(null);};
+  reader.readAsDataURL(file);
+}
+function findRecord(type,id){
+  var arr=type==='todo'?data.todos:(type==='insp'?data.inspirations:data.projects);
+  return arr.find(function(r){return r.id===id;});
+}
+async function addAttachment(type,id,input){
+  var files=input.files;if(!files||!files.length)return;
+  var rec=findRecord(type,id);if(!rec){input.value='';return;}
+  if(!rec.attachments) rec.attachments=[];
+  var added=0;
+  for(var i=0;i<files.length;i++){
+    var f=files[i];
+    if(f.type.startsWith('image/')){
+      await new Promise(function(res){
+        compressImage(f,function(dataUrl){
+          if(dataUrl){
+            if(rec.attachments.filter(function(a){return a.type==='image';}).length>=9){toast('图片最多 9 张','error');res();return;}
+            rec.attachments.push({id:uid(),type:'image',name:f.name,dataUrl:dataUrl,size:Math.round(dataUrl.length*0.75)});
+            added++;
+          }
+          res();
+        });
+      });
+    }else{
+      await new Promise(function(res){
+        readFileBase64(f,function(dataUrl){
+          if(dataUrl){
+            if(f.size>500*1024){toast(f.name+' 超 500KB，建议存网盘链接','error');res();return;}
+            if(rec.attachments.filter(function(a){return a.type==='file';}).length>=3){toast('文件最多 3 个','error');res();return;}
+            rec.attachments.push({id:uid(),type:'file',name:f.name,dataUrl:dataUrl,size:f.size});
+            added++;
+          }
+          res();
+        });
+      });
+    }
+  }
+  input.value='';
+  save();
+  var totalSize=JSON.stringify(data).length;
+  if(totalSize>4*1024*1024){toast('存储已超 4MB，建议导出备份并清理大文件','error');}
+  renderAll();
+  if(added>0) toast('已添加 '+added+' 个附件','success');
+}
+function deleteAttachment(type,id,attId){
+  var rec=findRecord(type,id);
+  if(!rec||!rec.attachments)return;
+  rec.attachments=rec.attachments.filter(function(a){return a.id!==attId;});
+  save();renderAll();
+}
+function renderAttachments(type,id){
+  var rec=findRecord(type,id);
+  if(!rec||!rec.attachments||!rec.attachments.length)return '';
+  var html='<div class="attachments">';
+  rec.attachments.forEach(function(a){
+    if(a.type==='image'){
+      html+='<div class="att-img"><img src="'+a.dataUrl+'" onclick="previewImage(this)"><div class="att-del" onclick="deleteAttachment(\''+type+'\',\''+id+'\',\''+a.id+'\')">×</div></div>';
+    }else{
+      html+='<a class="att-file" href="'+a.dataUrl+'" download="'+escapeAttr(a.name)+'"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z M13 2v7h7" stroke-linecap="round" stroke-linejoin="round"/></svg>'+escapeHtml(a.name)+'</a><div class="att-del" style="position:relative;display:inline-flex;background:transparent;color:var(--danger);" onclick="deleteAttachment(\''+type+'\',\''+id+'\',\''+a.id+'\')">×</div>';
+    }
+  });
+  html+='</div>';
+  return html;
+}
+function attUploadHtml(type,id){
+  return '<div class="att-upload"><input type="file" id="att-input-'+type+'-'+id+'" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt,.zip,.ppt,.pptx,.csv" multiple style="display:none" onchange="addAttachment(\''+type+'\',\''+id+'\',this)"><button class="att-upload-btn" onclick="document.getElementById(\'att-input-'+type+'-'+id+'\').click()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-linecap="round" stroke-linejoin="round"/></svg>图片/文件</button><span class="att-upload-hint">图片压缩800px·最多9张；文件≤500KB·最多3个</span></div>';
+}
+function previewImage(imgEl){
+  var m=document.getElementById('attPreviewMask');
+  m.querySelector('img').src=imgEl.src;
+  m.classList.add('show');
 }
 
 function init(){
