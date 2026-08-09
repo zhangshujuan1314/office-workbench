@@ -6,28 +6,28 @@
 <title>个人办公工作台</title>
 <style>
   :root{
-    --primary:#0d9488;
-    --primary-dark:#0f766e;
-    --primary-light:#ccfbf1;
-    --accent:#0891b2;
-    --bg:#f8fafc;
-    --card:#ffffff;
-    --text:#1e293b;
-    --muted:#64748b;
-    --border:#e2e8f0;
-    --danger:#dc2626;
-    --danger-bg:#fef2f2;
-    --warn:#d97706;
-    --warn-bg:#fffbeb;
-    --success:#16a34a;
-    --p0:#dc2626;
-    --p1:#ea580c;
-    --p2:#0891b2;
-    --p3:#64748b;
-    --shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
-    --shadow-lg:0 10px 30px rgba(15,23,42,.08);
-    --radius:14px;
-    --radius-sm:8px;
+    --primary:#D97757;
+    --primary-dark:#B85842;
+    --primary-light:#FAF0E8;
+    --accent:#C4634A;
+    --bg:#FAF9F5;
+    --card:#FFFFFF;
+    --text:#1A1A1A;
+    --muted:#6B6B6B;
+    --border:#E8E5DD;
+    --danger:#C8553D;
+    --danger-bg:#FBF0EE;
+    --warn:#D4914D;
+    --warn-bg:#FBF5EE;
+    --success:#4A7C59;
+    --p0:#C8553D;
+    --p1:#D97757;
+    --p2:#B89968;
+    --p3:#8B8276;
+    --shadow:0 1px 3px rgba(120,80,40,.07),0 1px 2px rgba(120,80,40,.04);
+    --shadow-lg:0 10px 30px rgba(120,80,40,.10);
+    --radius:16px;
+    --radius-sm:9px;
   }
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;}
@@ -55,7 +55,7 @@
   }
   .header-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
   .header-logo svg{width:34px;height:34px;}
-  .header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:.5px;}
+  .header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:.5px;font-family:Georgia,"Times New Roman","Songti SC",serif;}
   .header-sub{font-size:12px;color:var(--muted);margin-top:1px;}
   .header-banner{
     flex:1;
@@ -65,8 +65,8 @@
     gap:14px;
     padding:10px 18px;
     border-radius:12px;
-    background:linear-gradient(100deg,#f0fdfa 0%,#ecfeff 60%,#f0f9ff 100%);
-    border:1px solid #99f6e4;
+    background:linear-gradient(100deg,#FBF5EE 0%,#FAF0E8 60%,#FAF0E8 100%);
+    border:1px solid #E8C9B5;
     overflow:hidden;
   }
   .header-banner svg{width:90px;height:42px;flex-shrink:0;}
@@ -130,7 +130,7 @@
   }
   .top-alert-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;}
   .top-alert-title .dot{width:8px;height:8px;border-radius:50%;background:var(--danger);}
-  .top-alert.has-issue{border-color:#fecaca;background:linear-gradient(0deg,#fff 0%,#fffbeb 100%);}
+  .top-alert.has-issue{border-color:#fecaca;background:linear-gradient(0deg,#fff 0%,#FBF5EE 100%);}
   .top-alert.has-issue .top-alert-title .dot{animation:pulse 1.6s infinite;}
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
   .top-alert-empty{font-size:13px;color:var(--success);display:flex;align-items:center;gap:8px;}
@@ -140,7 +140,7 @@
     padding:9px 12px;border-radius:10px;background:var(--danger-bg);
     border:1px solid #fecaca;font-size:13px;
   }
-  .alert-item.warn{background:var(--warn-bg);border-color:#fde68a;}
+  .alert-item.warn{background:var(--warn-bg);border-color:#E8C9B5;}
   .alert-item-tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--danger);color:#fff;flex-shrink:0;}
   .alert-item.warn .alert-item-tag{background:var(--warn);}
   .alert-item-text{flex:1;min-width:0;color:var(--text);}
@@ -150,7 +150,7 @@
 
   /* backup reminder */
   .backup-reminder{
-    background:var(--warn-bg);border:1px solid #fde68a;border-radius:10px;
+    background:var(--warn-bg);border:1px solid #E8C9B5;border-radius:10px;
     padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e;
   }
   .backup-reminder svg{width:18px;height:18px;flex-shrink:0;}
@@ -161,7 +161,7 @@
   .section.active{display:block;animation:fadein .2s ease;}
   @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
   .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap;}
-  .section-head h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .section-head h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;font-family:Georgia,"Times New Roman","Songti SC",serif;}
   .section-head h2 svg{width:20px;height:20px;color:var(--primary);}
   .section-desc{font-size:12.5px;color:var(--muted);margin-top:2px;}
 
@@ -193,8 +193,8 @@
   .gtag-overdue{background:var(--danger);color:#fff;}
   .gtag-today{background:var(--primary);color:#fff;}
   .gtag-tomorrow{background:var(--accent);color:#fff;}
-  .gtag-week{background:#a5f3fc;color:#0c4a6e;}
-  .gtag-future{background:#e2e8f0;color:var(--text);}
+  .gtag-week{background:#EBDFC8;color:#8B6B3D;}
+  .gtag-future{background:#EDEAE2;color:var(--text);}
   .todo-group-head .gcount{margin-left:auto;color:var(--muted);font-weight:500;font-size:12px;}
 
   .todo-item{
@@ -202,7 +202,7 @@
     background:#fff;border:1px solid var(--border);margin-bottom:7px;transition:all .15s;
   }
   .todo-item:hover{border-color:#cbd5e1;box-shadow:var(--shadow);}
-  .todo-item.postponed{border-color:#fde68a;background:#fffbeb;}
+  .todo-item.postponed{border-color:#E8C9B5;background:#FBF5EE;}
   .todo-item.done{opacity:.6;}
   .todo-item.done .todo-title{text-decoration:line-through;color:var(--muted);}
 
@@ -226,7 +226,7 @@
   .todo-meta .meta-text{font-size:11.5px;color:var(--muted);}
   .todo-meta .meta-text.warn{color:var(--warn);font-weight:600;}
   .todo-meta .meta-text.danger{color:var(--danger);font-weight:600;}
-  .proj-link{font-size:11.5px;color:var(--accent);background:#ecfeff;padding:1px 7px;border-radius:5px;}
+  .proj-link{font-size:11.5px;color:var(--accent);background:#FAF0E8;padding:1px 7px;border-radius:5px;}
   .todo-actions{display:flex;gap:4px;flex-shrink:0;}
   .todo-empty{text-align:center;color:var(--muted);font-size:13px;padding:24px;}
 
@@ -257,7 +257,7 @@
   .proj-card.blocked{border-left-color:var(--danger);}
   .proj-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
   .proj-name{font-size:15px;font-weight:700;color:var(--text);}
-  .proj-stage{font-size:12px;color:var(--accent);background:#ecfeff;display:inline-block;padding:2px 8px;border-radius:6px;margin-top:4px;font-weight:500;}
+  .proj-stage{font-size:12px;color:var(--accent);background:#FAF0E8;display:inline-block;padding:2px 8px;border-radius:6px;margin-top:4px;font-weight:500;}
   .proj-block{margin-top:10px;padding:8px 10px;background:var(--danger-bg);border-radius:8px;font-size:12.5px;color:#991b1b;display:flex;gap:6px;align-items:flex-start;}
   .proj-block svg{width:14px;height:14px;flex-shrink:0;margin-top:2px;}
   .proj-row{margin-top:10px;font-size:13px;}
@@ -384,7 +384,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#0d9488">
+<meta name="theme-color" content="#D97757">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -395,7 +395,7 @@
 <header class="app-header">
   <div class="header-logo">
     <svg viewBox="0 0 40 40" fill="none">
-      <rect x="3" y="3" width="34" height="34" rx="9" fill="#0d9488"/>
+      <rect x="3" y="3" width="34" height="34" rx="9" fill="#D97757"/>
       <path d="M12 21l5 5 11-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <div>
@@ -405,10 +405,10 @@
   </div>
   <div class="header-banner">
     <svg viewBox="0 0 90 42" fill="none">
-      <rect x="2" y="6" width="22" height="30" rx="3" fill="#5eead4" opacity=".7"/>
-      <rect x="27" y="2" width="22" height="34" rx="3" fill="#2dd4bf" opacity=".85"/>
-      <rect x="52" y="10" width="22" height="26" rx="3" fill="#14b8a6"/>
-      <path d="M76 26l6-6 6 6" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="2" y="6" width="22" height="30" rx="3" fill="#F0C9B0" opacity=".7"/>
+      <rect x="27" y="2" width="22" height="34" rx="3" fill="#E8A584" opacity=".85"/>
+      <rect x="52" y="10" width="22" height="26" rx="3" fill="#D97757"/>
+      <path d="M76 26l6-6 6 6" stroke="#B85842" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
     <div class="header-banner-text">
       <b>专注当下，看清全局</b><br>
@@ -1106,7 +1106,7 @@ function renderReview(){
     html += '<div class="chart-empty">本周暂无完成数据</div>';
   }else{
     html += '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
-    html += drawPie(pCount,['#dc2626','#ea580c','#0891b2','#64748b'],['P0 紧急','P1 重要','P2 一般','P3 低']);
+    html += drawPie(pCount,['#C8553D','#D97757','#B89968','#6B6B6B'],['P0 紧急','P1 重要','P2 一般','P3 低']);
     html += '</div>';
   }
   html += '</div>';
@@ -1180,7 +1180,7 @@ function drawPie(data,colors,labels){
     acc=end;
     legend.push({name:labels[i],val:v,color:colors[i]});
   });
-  return `<svg width="140" height="140" viewBox="0 0 140 140" style="flex-shrink:0;">${paths}<circle cx="${cx}" cy="${cy}" r="22" fill="#fff"/><text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="700" fill="#1e293b">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="#64748b">总数</text></svg>
+  return `<svg width="140" height="140" viewBox="0 0 140 140" style="flex-shrink:0;">${paths}<circle cx="${cx}" cy="${cy}" r="22" fill="#fff"/><text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="700" fill="#1A1A1A">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="#6B6B6B">总数</text></svg>
     <div class="legend" style="flex:1;min-width:120px;">${legend.map(l=>`<div class="legend-item"><span class="legend-dot" style="background:${l.color};"></span><span class="lname">${l.name}</span><span class="lval">${l.val} 件 · ${Math.round(l.val/total*100)}%</span></div>`).join('')}</div>`;
 }
 
@@ -1196,14 +1196,14 @@ function drawLine(labels,values){
     const y=padT+innerH-f*innerH;
     return `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#f1f5f9" stroke-width="1"/>`;
   }).join('');
-  const dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#0d9488" stroke="#fff" stroke-width="2"/>`).join('');
-  const vlabels = pts.map((p,i)=>`<text x="${p[0].toFixed(1)}" y="${(p[1]-10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="#0f766e">${values[i]}</text>`).join('');
-  const xlabels = labels.map((l,i)=>`<text x="${(padL+i*step).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#64748b">${l}</text>`).join('');
+  const dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#D97757" stroke="#fff" stroke-width="2"/>`).join('');
+  const vlabels = pts.map((p,i)=>`<text x="${p[0].toFixed(1)}" y="${(p[1]-10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="#B85842">${values[i]}</text>`).join('');
+  const xlabels = labels.map((l,i)=>`<text x="${(padL+i*step).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#6B6B6B">${l}</text>`).join('');
   const ylabels = [0,Math.ceil(maxV/2),maxV].map((v,f)=>{
     const y=padT+innerH-f*innerH;
     return `<text x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="#94a3b8">${Math.round(v)}</text>`;
   }).join('');
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-width:560px;">${gridLines}${ylabels}<path d="${areaPath}" fill="#0d9488" opacity="0.1"/><path d="${linePath}" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${vlabels}${xlabels}</svg>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-width:560px;">${gridLines}${ylabels}<path d="${areaPath}" fill="#D97757" opacity="0.1"/><path d="${linePath}" fill="none" stroke="#D97757" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${vlabels}${xlabels}</svg>`;
 }
 
 /* ============ 导入导出 ============ */
