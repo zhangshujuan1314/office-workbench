@@ -289,6 +289,7 @@
   .chart-card h3{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
   .chart-card h3 svg{width:16px;height:16px;color:var(--primary);}
   .chart-empty{font-size:12.5px;color:var(--muted);text-align:center;padding:20px;}
+  .chart-illu{margin:0 auto 10px;width:100px;height:70px;opacity:.85;}
 
   .legend{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
   .legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;}
@@ -381,6 +382,11 @@
   @media(max-width:420px){
     .header-logo .header-title{font-size:15px;}
   }
+#appSplash{position:fixed;inset:0;background:linear-gradient(135deg,#FAF9F5 0%,#FAF0E8 100%);z-index:9999;display:flex;align-items:center;justify-content:center;transition:opacity .4s ease;}
+#appSplash.hide{opacity:0;pointer-events:none;}
+.splash-inner{text-align:center;}
+.splash-title{font-size:22px;font-weight:700;color:#1A1A1A;margin-top:16px;font-family:Georgia,"Times New Roman","Songti SC",serif;letter-spacing:.5px;}
+.splash-sub{font-size:12px;color:#6B6B6B;margin-top:4px;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -392,6 +398,7 @@
 <meta name="apple-mobile-web-app-title" content="工作台">
 </head>
 <body>
+<div id="appSplash"><div class="splash-inner"><svg viewBox="0 0 40 40" width="64" height="64"><rect x="3" y="3" width="34" height="34" rx="9" fill="#D97757"/><path d="M12 21l5 5 11-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg><div class="splash-title">办公工作台</div><div class="splash-sub">个人效率 · 本地持久</div></div></div>
 
 <header class="app-header">
   <div class="header-logo">
@@ -406,10 +413,16 @@
   </div>
   <div class="header-banner">
     <svg viewBox="0 0 90 42" fill="none">
-      <rect x="2" y="6" width="22" height="30" rx="3" fill="#F0C9B0" opacity=".7"/>
-      <rect x="27" y="2" width="22" height="34" rx="3" fill="#E8A584" opacity=".85"/>
-      <rect x="52" y="10" width="22" height="26" rx="3" fill="#D97757"/>
-      <path d="M76 26l6-6 6 6" stroke="#B85842" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M9 16 l13 0 l-1.5 11 a3 3 0 0 1 -3 2.5 l-4 0 a3 3 0 0 1 -3 -2.5 z" fill="#FAF0E8" stroke="#D97757" stroke-width="1.5" stroke-linejoin="round"/>
+      <path d="M22 18 a2.5 2.5 0 0 1 0 5" stroke="#D97757" stroke-width="1.5" fill="none"/>
+      <path d="M13 10 q1.5 -2 0 -3.5" stroke="#B89968" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <path d="M18 10 q1.5 -2 0 -3.5" stroke="#B89968" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+      <rect x="36" y="8" width="20" height="26" rx="3" fill="#FFFFFF" stroke="#D97757" stroke-width="1.5"/>
+      <line x1="40" y1="14" x2="52" y2="14" stroke="#B89968" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="40" y1="19" x2="50" y2="19" stroke="#B89968" stroke-width="1.2" stroke-linecap="round"/>
+      <path d="M40 25 l2.5 2.5 l4.5 -5" stroke="#4A7C59" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M63 10 l5 0 l2 16 l-2 1 l-5 0 l-2 -1 z" fill="#D97757" stroke="#B85842" stroke-width="1"/>
+      <path d="M65 28 l5 0 l-2.5 4 z" fill="#B85842"/>
     </svg>
     <div class="header-banner-text">
       <b>专注当下，看清全局</b><br>
@@ -725,7 +738,7 @@ function renderTopAlert(){
 
   let html = '<div class="top-alert-title"><span class="dot"></span> 今天要处理</div>';
   if(overdue.length===0 && blockedProjects.length===0){
-    html += '<div class="top-alert-empty"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> 一切就绪，今天没有逾期或卡点</div>';
+    html += '<div class="top-alert-empty"><svg viewBox="0 0 80 60" width="48" height="36" fill="none"><path d="M40 10 l4.5 9 l10 1 l-7.5 6.5 l2.5 10 l-9.5 -5.5 l-9.5 5.5 l2.5 -10 l-7.5 -6.5 l10 -1 z" fill="#D97757" stroke="#B85842" stroke-width="1.2" stroke-linejoin="round"/><circle cx="14" cy="18" r="1.8" fill="#B89968"/><circle cx="66" cy="20" r="1.8" fill="#B89968"/><circle cx="18" cy="46" r="1.6" fill="#4A7C59"/><circle cx="64" cy="44" r="1.6" fill="#4A7C59"/><line x1="40" y1="2" x2="40" y2="6" stroke="#D97757" stroke-width="1.5" stroke-linecap="round"/></svg> 一切就绪，今天没有逾期或卡点</div>';
   }else{
     html += '<div class="alert-list">';
     overdue.forEach(t=>{
@@ -1104,7 +1117,7 @@ function renderReview(){
   // 优先级饼图
   html += '<div class="chart-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9M12 3a9 9 0 0 1 9 9h-9V3z" stroke-linecap="round" stroke-linejoin="round"/></svg> 完成任务优先级分布</h3>';
   if(weekDoneCount===0){
-    html += '<div class="chart-empty">本周暂无完成数据</div>';
+    html += '<div class="chart-empty"><div class="chart-illu"><svg viewBox="0 0 100 70" fill="none"><line x1="14" y1="52" x2="86" y2="52" stroke="#B89968" stroke-width="1.5" stroke-linecap="round"/><rect x="22" y="34" width="8" height="18" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="40" y="24" width="8" height="28" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="58" y="40" width="8" height="12" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="74" cy="22" r="9" fill="#FAF0E8" stroke="#D97757" stroke-width="1.8"/><line x1="80" y1="28" x2="86" y2="34" stroke="#D97757" stroke-width="2" stroke-linecap="round"/><path d="M70 22 l2.5 2.5 l5 -6" stroke="#4A7C59" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>本周暂无完成数据</div>';
   }else{
     html += '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
     html += drawPie(pCount,['#C8553D','#D97757','#B89968','#6B6B6B'],['P0 紧急','P1 重要','P2 一般','P3 低']);
@@ -1116,7 +1129,7 @@ function renderReview(){
   html += '<div class="chart-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 精力花在哪些项目</h3>';
   const projEntries = Object.entries(projEffort).sort((a,b)=>b[1]-a[1]);
   if(projEntries.length===0){
-    html += '<div class="chart-empty">本周暂无完成数据</div>';
+    html += '<div class="chart-empty"><div class="chart-illu"><svg viewBox="0 0 100 70" fill="none"><line x1="14" y1="52" x2="86" y2="52" stroke="#B89968" stroke-width="1.5" stroke-linecap="round"/><rect x="22" y="34" width="8" height="18" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="40" y="24" width="8" height="28" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="58" y="40" width="8" height="12" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="74" cy="22" r="9" fill="#FAF0E8" stroke="#D97757" stroke-width="1.8"/><line x1="80" y1="28" x2="86" y2="34" stroke="#D97757" stroke-width="2" stroke-linecap="round"/><path d="M70 22 l2.5 2.5 l5 -6" stroke="#4A7C59" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>本周暂无完成数据</div>';
   }else{
     const maxV = Math.max(...projEntries.map(e=>e[1]));
     projEntries.forEach(([name,v])=>{
@@ -1128,7 +1141,7 @@ function renderReview(){
   // 每日趋势折线图
   html += '<div class="chart-card" style="margin-bottom:14px;"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 本周每日完成趋势</h3>';
   if(weekDoneCount===0){
-    html += '<div class="chart-empty">本周暂无完成数据</div>';
+    html += '<div class="chart-empty"><div class="chart-illu"><svg viewBox="0 0 100 70" fill="none"><line x1="14" y1="52" x2="86" y2="52" stroke="#B89968" stroke-width="1.5" stroke-linecap="round"/><rect x="22" y="34" width="8" height="18" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="40" y="24" width="8" height="28" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><rect x="58" y="40" width="8" height="12" rx="1" fill="none" stroke="#D97757" stroke-width="1.5" stroke-dasharray="3 2"/><circle cx="74" cy="22" r="9" fill="#FAF0E8" stroke="#D97757" stroke-width="1.8"/><line x1="80" y1="28" x2="86" y2="34" stroke="#D97757" stroke-width="2" stroke-linecap="round"/><path d="M70 22 l2.5 2.5 l5 -6" stroke="#4A7C59" stroke-width="1.6" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div>本周暂无完成数据</div>';
   }else{
     html += drawLine(dailyLabels,dailyValues);
   }
@@ -1358,6 +1371,7 @@ if('serviceWorker' in navigator){
     navigator.serviceWorker.register('sw.js').catch(function(){});
   });
 }
+window.addEventListener('load',function(){var s=document.getElementById('appSplash');if(!s)return;setTimeout(function(){s.classList.add('hide');setTimeout(function(){s.remove();},450);},350);});
 </script>
 </body>
 </html>
