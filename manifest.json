@@ -1,0 +1,18 @@
+{
+  "name": "个人办公工作台",
+  "short_name": "工作台",
+  "description": "待办 · 灵感 · 项目 · 复盘，一站式个人办公效率台。数据本地保存，离线可用。",
+  "start_url": "./?source=pwa",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f8fafc",
+  "theme_color": "#0d9488",
+  "lang": "zh-CN",
+  "dir": "ltr",
+  "categories": ["productivity","business"],
+  "icons": [
+    {"src":"icon.svg","sizes":"192x192 256x256 384x384 512x512 any","type":"image/svg+xml","purpose":"any"},
+    {"src":"icon-maskable.svg","sizes":"192x192 256x256 384x384 512x512 any","type":"image/svg+xml","purpose":"maskable"}
+  ]
+}

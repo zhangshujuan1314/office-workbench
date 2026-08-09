@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>个人办公工作台</title>
+<style>
+  :root{
+    --primary:#0d9488;
+    --primary-dark:#0f766e;
+    --primary-light:#ccfbf1;
+    --accent:#0891b2;
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#1e293b;
+    --muted:#64748b;
+    --border:#e2e8f0;
+    --danger:#dc2626;
+    --danger-bg:#fef2f2;
+    --warn:#d97706;
+    --warn-bg:#fffbeb;
+    --success:#16a34a;
+    --p0:#dc2626;
+    --p1:#ea580c;
+    --p2:#0891b2;
+    --p3:#64748b;
+    --shadow:0 1px 3px rgba(15,23,42,.06),0 1px 2px rgba(15,23,42,.04);
+    --shadow-lg:0 10px 30px rgba(15,23,42,.08);
+    --radius:14px;
+    --radius-sm:8px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"PingFang SC","Microsoft YaHei",sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    font-size:15px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+  input,textarea,select{font-family:inherit;font-size:16px;color:var(--text);}
+  input:focus,textarea:focus,select:focus{outline:2px solid var(--primary);outline-offset:1px;}
+
+  /* ===== Header ===== */
+  .app-header{
+    background:var(--card);
+    border-bottom:1px solid var(--border);
+    padding:16px 24px;
+    display:flex;
+    align-items:center;
+    gap:16px;
+    position:sticky;top:0;z-index:50;
+  }
+  .header-logo{display:flex;align-items:center;gap:10px;flex-shrink:0;}
+  .header-logo svg{width:34px;height:34px;}
+  .header-title{font-size:18px;font-weight:700;color:var(--text);letter-spacing:.5px;}
+  .header-sub{font-size:12px;color:var(--muted);margin-top:1px;}
+  .header-banner{
+    flex:1;
+    min-width:0;
+    display:flex;
+    align-items:center;
+    gap:14px;
+    padding:10px 18px;
+    border-radius:12px;
+    background:linear-gradient(100deg,#f0fdfa 0%,#ecfeff 60%,#f0f9ff 100%);
+    border:1px solid #99f6e4;
+    overflow:hidden;
+  }
+  .header-banner svg{width:90px;height:42px;flex-shrink:0;}
+  .header-banner-text{font-size:12.5px;color:var(--primary-dark);line-height:1.45;min-width:0;}
+  .header-banner-text b{color:var(--text);}
+  .header-actions{display:flex;gap:8px;flex-shrink:0;}
+
+  .btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:6px;
+    padding:9px 14px;border-radius:var(--radius-sm);
+    font-size:13.5px;font-weight:600;
+    min-height:40px;
+    transition:all .15s;
+    border:1px solid transparent;
+    white-space:nowrap;
+  }
+  .btn svg{width:15px;height:15px;}
+  .btn-primary{background:var(--primary);color:#fff;}
+  .btn-primary:hover{background:var(--primary-dark);}
+  .btn-ghost{background:var(--card);color:var(--text);border-color:var(--border);}
+  .btn-ghost:hover{background:#f1f5f9;border-color:#cbd5e1;}
+  .btn-danger{background:var(--card);color:var(--danger);border-color:#fecaca;}
+  .btn-danger:hover{background:var(--danger-bg);}
+  .btn-sm{padding:6px 10px;min-height:34px;font-size:12.5px;}
+  .btn-icon{padding:0;width:36px;height:36px;min-height:36px;border-radius:8px;}
+  .btn-icon svg{width:16px;height:16px;}
+
+  /* ===== Layout ===== */
+  .layout{display:flex;max-width:1320px;margin:0 auto;padding:18px;gap:18px;align-items:flex-start;}
+  .sidebar{
+    width:200px;flex-shrink:0;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:10px;
+    position:sticky;top:88px;
+    box-shadow:var(--shadow);
+  }
+  .nav-item{
+    display:flex;align-items:center;gap:11px;
+    width:100%;padding:11px 12px;
+    border-radius:10px;font-size:14px;font-weight:500;color:var(--muted);
+    text-align:left;transition:all .15s;
+    min-height:44px;
+  }
+  .nav-item:hover{background:#f1f5f9;color:var(--text);}
+  .nav-item.active{background:var(--primary-light);color:var(--primary-dark);font-weight:600;}
+  .nav-item svg{width:18px;height:18px;flex-shrink:0;}
+  .nav-item .count-badge{
+    margin-left:auto;background:var(--danger);color:#fff;
+    font-size:11px;font-weight:700;padding:1px 7px;border-radius:10px;min-width:20px;text-align:center;
+  }
+  .nav-item.active .count-badge{background:var(--primary);}
+  .main{flex:1;min-width:0;}
+
+  /* ===== Top Alert (今天要处理) ===== */
+  .top-alert{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:var(--radius);padding:16px 18px;margin-bottom:18px;
+    box-shadow:var(--shadow);
+  }
+  .top-alert-title{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:700;color:var(--text);margin-bottom:12px;}
+  .top-alert-title .dot{width:8px;height:8px;border-radius:50%;background:var(--danger);}
+  .top-alert.has-issue{border-color:#fecaca;background:linear-gradient(0deg,#fff 0%,#fffbeb 100%);}
+  .top-alert.has-issue .top-alert-title .dot{animation:pulse 1.6s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.4;}}
+  .top-alert-empty{font-size:13px;color:var(--success);display:flex;align-items:center;gap:8px;}
+  .alert-list{display:flex;flex-direction:column;gap:8px;}
+  .alert-item{
+    display:flex;align-items:center;gap:10px;
+    padding:9px 12px;border-radius:10px;background:var(--danger-bg);
+    border:1px solid #fecaca;font-size:13px;
+  }
+  .alert-item.warn{background:var(--warn-bg);border-color:#fde68a;}
+  .alert-item-tag{font-size:11px;font-weight:700;padding:2px 7px;border-radius:6px;background:var(--danger);color:#fff;flex-shrink:0;}
+  .alert-item.warn .alert-item-tag{background:var(--warn);}
+  .alert-item-text{flex:1;min-width:0;color:var(--text);}
+  .alert-item-text .sub{color:var(--muted);font-size:12px;}
+  .alert-item-btn{font-size:12px;color:var(--primary-dark);font-weight:600;padding:4px 10px;border-radius:6px;background:#fff;border:1px solid var(--border);}
+  .alert-item-btn:hover{background:var(--primary-light);}
+
+  /* backup reminder */
+  .backup-reminder{
+    background:var(--warn-bg);border:1px solid #fde68a;border-radius:10px;
+    padding:10px 14px;margin-bottom:14px;display:flex;align-items:center;gap:10px;font-size:13px;color:#92400e;
+  }
+  .backup-reminder svg{width:18px;height:18px;flex-shrink:0;}
+  .backup-reminder .btn-sm{margin-left:auto;}
+
+  /* ===== Sections ===== */
+  .section{display:none;}
+  .section.active{display:block;animation:fadein .2s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+  .section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;flex-wrap:wrap;}
+  .section-head h2{font-size:18px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .section-head h2 svg{width:20px;height:20px;color:var(--primary);}
+  .section-desc{font-size:12.5px;color:var(--muted);margin-top:2px;}
+
+  /* ===== Card ===== */
+  .card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);}
+  .card + .card{margin-top:14px;}
+  .card-title{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+  .card-title .count{margin-left:auto;font-size:12px;color:var(--muted);font-weight:500;}
+
+  /* ===== Form ===== */
+  .form-row{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;}
+  .form-field{display:flex;flex-direction:column;gap:4px;}
+  .form-field label{font-size:12px;color:var(--muted);font-weight:500;}
+  .form-field input,.form-field select,.form-field textarea{
+    padding:9px 12px;border:1px solid var(--border);border-radius:8px;background:#fff;
+    min-height:42px;
+  }
+  .form-field textarea{min-height:60px;resize:vertical;}
+  .flex-1{flex:1;min-width:140px;}
+  .flex-2{flex:2;min-width:200px;}
+
+  /* ===== Todo ===== */
+  .todo-group{margin-bottom:16px;}
+  .todo-group-head{
+    display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);
+    margin-bottom:8px;padding-bottom:6px;border-bottom:1px dashed var(--border);
+  }
+  .todo-group-head .gtag{font-size:11px;font-weight:700;padding:2px 8px;border-radius:6px;}
+  .gtag-overdue{background:var(--danger);color:#fff;}
+  .gtag-today{background:var(--primary);color:#fff;}
+  .gtag-tomorrow{background:var(--accent);color:#fff;}
+  .gtag-week{background:#a5f3fc;color:#0c4a6e;}
+  .gtag-future{background:#e2e8f0;color:var(--text);}
+  .todo-group-head .gcount{margin-left:auto;color:var(--muted);font-weight:500;font-size:12px;}
+
+  .todo-item{
+    display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;
+    background:#fff;border:1px solid var(--border);margin-bottom:7px;transition:all .15s;
+  }
+  .todo-item:hover{border-color:#cbd5e1;box-shadow:var(--shadow);}
+  .todo-item.postponed{border-color:#fde68a;background:#fffbeb;}
+  .todo-item.done{opacity:.6;}
+  .todo-item.done .todo-title{text-decoration:line-through;color:var(--muted);}
+
+  .check-btn{
+    width:22px;height:22px;border-radius:6px;border:2px solid #cbd5e1;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;
+  }
+  .check-btn:hover{border-color:var(--primary);}
+  .todo-item.done .check-btn{background:var(--success);border-color:var(--success);}
+  .check-btn svg{width:14px;height:14px;color:#fff;opacity:0;}
+  .todo-item.done .check-btn svg{opacity:1;}
+
+  .todo-main{flex:1;min-width:0;}
+  .todo-title{font-size:14px;font-weight:500;color:var(--text);word-break:break-word;}
+  .todo-meta{display:flex;align-items:center;gap:8px;margin-top:3px;flex-wrap:wrap;}
+  .pchip{font-size:10.5px;font-weight:700;padding:1px 7px;border-radius:5px;color:#fff;}
+  .pchip-P0{background:var(--p0);}
+  .pchip-P1{background:var(--p1);}
+  .pchip-P2{background:var(--p2);}
+  .pchip-P3{background:var(--p3);}
+  .todo-meta .meta-text{font-size:11.5px;color:var(--muted);}
+  .todo-meta .meta-text.warn{color:var(--warn);font-weight:600;}
+  .todo-meta .meta-text.danger{color:var(--danger);font-weight:600;}
+  .proj-link{font-size:11.5px;color:var(--accent);background:#ecfeff;padding:1px 7px;border-radius:5px;}
+  .todo-actions{display:flex;gap:4px;flex-shrink:0;}
+  .todo-empty{text-align:center;color:var(--muted);font-size:13px;padding:24px;}
+
+  /* ===== Inspiration ===== */
+  .insp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+  .insp-card{
+    background:#fff;border:1px solid var(--border);border-radius:12px;padding:14px;
+    position:relative;transition:all .15s;
+  }
+  .insp-card:hover{box-shadow:var(--shadow-lg);border-color:#cbd5e1;}
+  .insp-content{font-size:14px;line-height:1.6;color:var(--text);word-break:break-word;white-space:pre-wrap;}
+  .insp-tags{display:flex;flex-wrap:wrap;gap:5px;margin-top:10px;}
+  .insp-tag{font-size:11px;padding:2px 8px;border-radius:5px;background:var(--primary-light);color:var(--primary-dark);font-weight:500;}
+  .insp-foot{display:flex;align-items:center;justify-content:space-between;margin-top:10px;font-size:11px;color:var(--muted);}
+  .insp-del{position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted);opacity:0;transition:all .15s;}
+  .insp-card:hover .insp-del{opacity:1;}
+  .insp-del:hover{background:var(--danger-bg);color:var(--danger);}
+  .insp-del svg{width:14px;height:14px;}
+
+  .tag-filter{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;}
+  .tag-filter-item{font-size:12px;padding:5px 11px;border-radius:16px;background:#fff;border:1px solid var(--border);color:var(--muted);font-weight:500;min-height:30px;}
+  .tag-filter-item:hover{border-color:#cbd5e1;}
+  .tag-filter-item.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+  /* ===== Project ===== */
+  .proj-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px;}
+  .proj-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;border-left:4px solid var(--primary);}
+  .proj-card.blocked{border-left-color:var(--danger);}
+  .proj-head{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:10px;}
+  .proj-name{font-size:15px;font-weight:700;color:var(--text);}
+  .proj-stage{font-size:12px;color:var(--accent);background:#ecfeff;display:inline-block;padding:2px 8px;border-radius:6px;margin-top:4px;font-weight:500;}
+  .proj-block{margin-top:10px;padding:8px 10px;background:var(--danger-bg);border-radius:8px;font-size:12.5px;color:#991b1b;display:flex;gap:6px;align-items:flex-start;}
+  .proj-block svg{width:14px;height:14px;flex-shrink:0;margin-top:2px;}
+  .proj-row{margin-top:10px;font-size:13px;}
+  .proj-row .lbl{color:var(--muted);font-size:11.5px;font-weight:600;margin-bottom:2px;}
+  .proj-progress{margin-top:12px;}
+  .proj-progress-head{display:flex;justify-content:space-between;font-size:11.5px;color:var(--muted);margin-bottom:5px;}
+  .progress-bar{height:7px;background:#f1f5f9;border-radius:4px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:4px;transition:width .3s;}
+  .proj-todos{margin-top:10px;border-top:1px dashed var(--border);padding-top:8px;}
+  .proj-todo-mini{display:flex;align-items:center;gap:6px;font-size:12px;padding:3px 0;color:var(--muted);}
+  .proj-todo-mini .mini-check{width:13px;height:13px;border-radius:3px;border:1.5px solid #cbd5e1;flex-shrink:0;}
+  .proj-todo-mini.done{color:var(--success);}
+  .proj-todo-mini.done .mini-check{background:var(--success);border-color:var(--success);}
+  .proj-todo-mini.done span{text-decoration:line-through;}
+  .proj-actions{display:flex;gap:6px;margin-top:12px;}
+
+  /* ===== Review ===== */
+  .review-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px;margin-bottom:18px;}
+  .stat-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;position:relative;overflow:hidden;}
+  .stat-card .stat-label{font-size:12px;color:var(--muted);font-weight:500;}
+  .stat-card .stat-num{font-size:30px;font-weight:700;color:var(--text);margin-top:4px;line-height:1;}
+  .stat-card .stat-sub{font-size:11.5px;color:var(--muted);margin-top:5px;}
+  .stat-card.accent{border-left:4px solid var(--primary);}
+  .stat-card.accent .stat-num{color:var(--primary-dark);}
+
+  .review-charts{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+  .chart-card{background:#fff;border:1px solid var(--border);border-radius:14px;padding:16px;}
+  .chart-card h3{font-size:14px;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+  .chart-card h3 svg{width:16px;height:16px;color:var(--primary);}
+  .chart-empty{font-size:12.5px;color:var(--muted);text-align:center;padding:20px;}
+
+  .legend{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:12.5px;}
+  .legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+  .legend-item .lname{flex:1;}
+  .legend-item .lval{color:var(--muted);font-weight:600;}
+
+  .bar-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;font-size:12.5px;}
+  .bar-row .bname{width:80px;flex-shrink:0;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .bar-track{flex:1;height:18px;background:#f1f5f9;border-radius:5px;overflow:hidden;position:relative;}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:5px;transition:width .4s;}
+  .bar-row .bval{width:30px;text-align:right;color:var(--muted);font-weight:600;flex-shrink:0;}
+
+  .blocker-list{display:flex;flex-direction:column;gap:8px;}
+  .blocker-item{padding:10px 12px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;font-size:13px;}
+  .blocker-item .b-title{font-weight:600;color:#9a3412;}
+  .blocker-item .b-desc{color:#c2410c;margin-top:3px;font-size:12.5px;}
+
+  /* ===== Modal ===== */
+  .modal-mask{
+    position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:100;
+    display:none;align-items:center;justify-content:center;padding:18px;
+    backdrop-filter:blur(2px);
+  }
+  .modal-mask.show{display:flex;animation:fadein .15s;}
+  .modal{
+    background:#fff;border-radius:16px;padding:22px;max-width:460px;width:100%;
+    box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto;
+  }
+  .modal h3{font-size:17px;font-weight:700;margin-bottom:6px;}
+  .modal p{font-size:13.5px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:18px;}
+  .modal-actions .btn{flex:1;}
+  .modal textarea.input-block{width:100%;padding:10px 12px;border:1px solid var(--border);border-radius:8px;min-height:120px;font-family:monospace;font-size:12px;resize:vertical;}
+
+  /* toast */
+  .toast{
+    position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(80px);
+    background:var(--text);color:#fff;padding:10px 18px;border-radius:24px;
+    font-size:13px;z-index:200;opacity:0;transition:all .3s;box-shadow:var(--shadow-lg);
+    max-width:90vw;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast.success{background:var(--success);}
+  .toast.error{background:var(--danger);}
+
+  /* ===== Mobile bottom nav ===== */
+  .mobile-nav{display:none;}
+  .hamburger{display:none;}
+
+  @media(max-width:768px){
+    .app-header{padding:12px 14px;gap:10px;flex-wrap:wrap;}
+    .header-banner{display:none;}
+    .header-title{font-size:16px;}
+    .header-sub{display:none;}
+    .header-actions .btn{padding:8px 11px;font-size:12.5px;}
+    .header-actions .btn span.lbl{display:none;}
+    .header-actions .btn{min-height:38px;}
+
+    .layout{padding:12px;gap:0;flex-direction:column;padding-bottom:80px;}
+    .sidebar{display:none;}
+    .main{width:100%;}
+
+    .section-head h2{font-size:16px;}
+    .review-charts{grid-template-columns:1fr;}
+    .insp-grid{grid-template-columns:1fr;}
+    .proj-grid{grid-template-columns:1fr;}
+
+    .form-field input,.form-field select,.form-field textarea{font-size:16px;}
+
+    .mobile-nav{
+      display:flex;position:fixed;bottom:0;left:0;right:0;z-index:60;
+      background:#fff;border-top:1px solid var(--border);
+      padding:6px 4px;padding-bottom:calc(6px + env(safe-area-inset-bottom));
+      justify-content:space-around;
+    }
+    .mobile-nav button{
+      flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;
+      padding:7px 2px;font-size:11px;color:var(--muted);font-weight:500;min-height:50px;
+    }
+    .mobile-nav button svg{width:20px;height:20px;}
+    .mobile-nav button.active{color:var(--primary-dark);}
+
+    .todo-actions{flex-direction:column;gap:3px;}
+    .todo-actions .btn-icon{width:30px;height:30px;min-height:30px;}
+    .todo-actions .btn-icon svg{width:14px;height:14px;}
+    .modal{padding:18px;}
+    .btn{min-height:44px;}
+  }
+  @media(max-width:420px){
+    .header-logo .header-title{font-size:15px;}
+  }
+</style>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/svg+xml" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.svg">
+<meta name="theme-color" content="#0d9488">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="工作台">
+</head>
+<body>
+
+<header class="app-header">
+  <div class="header-logo">
+    <svg viewBox="0 0 40 40" fill="none">
+      <rect x="3" y="3" width="34" height="34" rx="9" fill="#0d9488"/>
+      <path d="M12 21l5 5 11-12" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div>
+      <div class="header-title">办公工作台</div>
+      <div class="header-sub">个人效率 · 本地持久</div>
+    </div>
+  </div>
+  <div class="header-banner">
+    <svg viewBox="0 0 90 42" fill="none">
+      <rect x="2" y="6" width="22" height="30" rx="3" fill="#5eead4" opacity=".7"/>
+      <rect x="27" y="2" width="22" height="34" rx="3" fill="#2dd4bf" opacity=".85"/>
+      <rect x="52" y="10" width="22" height="26" rx="3" fill="#14b8a6"/>
+      <path d="M76 26l6-6 6 6" stroke="#0f766e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="header-banner-text">
+      <b>专注当下，看清全局</b><br>
+      待办 · 灵感 · 项目 · 复盘 一站搞定
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-ghost" onclick="exportJSON()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="lbl">导出</span>
+    </button>
+    <button class="btn btn-ghost" onclick="document.getElementById('importFile').click()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span class="lbl">导入</span>
+    </button>
+    <input type="file" id="importFile" accept="application/json" style="display:none" onchange="importJSON(event)">
+  </div>
+</header>
+
+<!-- 顶部今天要处理 + 备份提醒 -->
+<div style="max-width:1320px;margin:0 auto;padding:18px 18px 0;">
+  <div id="backupReminder" style="display:none;"></div>
+  <div id="topAlert" class="top-alert"></div>
+</div>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <button class="nav-item active" data-section="todo" onclick="switchSection('todo')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      今天待办
+      <span class="count-badge" id="navTodoBadge" style="display:none;"></span>
+    </button>
+    <button class="nav-item" data-section="inspiration" onclick="switchSection('inspiration')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      灵感速记
+    </button>
+    <button class="nav-item" data-section="project" onclick="switchSection('project')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM7 13l3 3 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      项目跟进
+      <span class="count-badge" id="navProjBadge" style="display:none;background:var(--warn);"></span>
+    </button>
+    <button class="nav-item" data-section="review" onclick="switchSection('review')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      每周复盘
+    </button>
+    <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <button class="nav-item" onclick="confirmClearAll()" style="color:var(--danger);">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        清空数据
+      </button>
+      <button class="nav-item" onclick="confirmClearSample()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 7H5M9 11h6M9 15h6M5 7l1-3h12l1 3M5 7v13a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        清空示例
+      </button>
+      <button class="nav-item" onclick="restoreSample()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 2v6h6M3 8a10 10 0 1 1 1 7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        恢复示例
+      </button>
+    </div>
+  </aside>
+
+  <main class="main">
+    <!-- ===== 今天待办 ===== -->
+    <section id="section-todo" class="section active">
+      <div class="section-head">
+        <div>
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke-linecap="round" stroke-linejoin="round"/></svg> 今天待办</h2>
+          <div class="section-desc">按日期分组 · 逾期自动顺延到今天并记录次数 · 完成打勾</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <div class="form-field flex-2">
+            <label>任务内容</label>
+            <input type="text" id="todoInput" placeholder="例如：整理季度汇报材料" onkeydown="if(event.key==='Enter')addTodo()">
+          </div>
+          <div class="form-field">
+            <label>轻重缓急</label>
+            <select id="todoPriority">
+              <option value="P0">P0 紧急</option>
+              <option value="P1" selected>P1 重要</option>
+              <option value="P2">P2 一般</option>
+              <option value="P3">P3 低</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label>截止日期</label>
+            <input type="date" id="todoDue">
+          </div>
+          <div class="form-field">
+            <label>关联项目</label>
+            <select id="todoProject"><option value="">不关联</option></select>
+          </div>
+          <div class="form-field">
+            <label style="visibility:hidden;">.</label>
+            <button class="btn btn-primary" onclick="addTodo()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+              添加
+            </button>
+          </div>
+        </div>
+      </div>
+      <div id="todoList" style="margin-top:14px;"></div>
+    </section>
+
+    <!-- ===== 灵感速记 ===== -->
+    <section id="section-inspiration" class="section">
+      <div class="section-head">
+        <div>
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg> 灵感速记</h2>
+          <div class="section-desc">随手记想法 · 逗号分隔打标签 · 点标签快速筛选</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="form-row">
+          <div class="form-field" style="flex:1;min-width:200px;">
+            <label>记下你的想法</label>
+            <textarea id="inspInput" placeholder="例如：把周报改成卡片式，信息密度更高" style="min-height:48px;"></textarea>
+          </div>
+          <div class="form-field" style="min-width:180px;">
+            <label>标签（逗号分隔）</label>
+            <input type="text" id="inspTags" placeholder="周报, 设计">
+          </div>
+          <div class="form-field">
+            <label style="visibility:hidden;">.</label>
+            <button class="btn btn-primary" onclick="addInspiration()">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+              记下
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="tag-filter" id="tagFilter"></div>
+      <div class="insp-grid" id="inspList"></div>
+    </section>
+
+    <!-- ===== 项目跟进 ===== -->
+    <section id="section-project" class="section">
+      <div class="section-head">
+        <div>
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7zM7 13l3 3 6-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 项目跟进</h2>
+          <div class="section-desc">记阶段 · 记下一步 · 记卡点 · 自动汇总关联待办进度</div>
+        </div>
+        <button class="btn btn-primary" onclick="openProjectModal()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14" stroke-linecap="round"/></svg>
+          新建项目
+        </button>
+      </div>
+      <div class="proj-grid" id="projList"></div>
+    </section>
+
+    <!-- ===== 每周复盘 ===== -->
+    <section id="section-review" class="section">
+      <div class="section-head">
+        <div>
+          <h2><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 每周复盘</h2>
+          <div class="section-desc">本周一到今天 · 完成数 / 优先级分布 / 精力分布 / 卡点汇总</div>
+        </div>
+      </div>
+      <div id="reviewContent"></div>
+    </section>
+  </main>
+</div>
+
+<!-- 移动端底部导航 -->
+<nav class="mobile-nav">
+  <button class="active" data-section="todo" onclick="switchSection('todo')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    待办
+  </button>
+  <button data-section="inspiration" onclick="switchSection('inspiration')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.3 1 2.1V18h6v-1.2c0-.8.4-1.6 1-2.1A7 7 0 0 0 12 2z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    灵感
+  </button>
+  <button data-section="project" onclick="switchSection('project')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    项目
+  </button>
+  <button data-section="review" onclick="switchSection('review')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    复盘
+  </button>
+</nav>
+
+<!-- ===== 通用模态框 ===== -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBox"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ 数据层 ============ */
+const DB_KEY = 'wb_office_data_v1';
+let data = null;
+let currentTagFilter = null;
+
+function todayStr(){
+  const d = new Date();
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function dateOffset(days){
+  const d = new Date();
+  d.setDate(d.getDate()+days);
+  return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2,7);}
+
+function fmtDate(s){
+  if(!s) return '';
+  const d = new Date(s+'T00:00:00');
+  const today = new Date(todayStr()+'T00:00:00');
+  const diff = Math.round((d-today)/86400000);
+  if(diff===0) return '今天';
+  if(diff===1) return '明天';
+  if(diff===-1) return '昨天';
+  if(diff>1 && diff<=6){
+    return ['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+  }
+  if(diff<0) return '逾期'+Math.abs(diff)+'天';
+  return (d.getMonth()+1)+'月'+d.getDate()+'日';
+}
+function fmtDateTime(s){
+  const d = new Date(s);
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+
+function defaultData(){
+  const t = todayStr();
+  return {
+    todos:[
+      {id:uid(),title:'整理Q3季度汇报材料',priority:'P0',dueDate:t,completed:false,projectId:'p_sample_1',postponeCount:0,isSample:true,createdAt:Date.now()-86400000*2},
+      {id:uid(),title:'回复客户合同邮件',priority:'P1',dueDate:t,completed:false,projectId:null,postponeCount:0,isSample:true,createdAt:Date.now()-86400000},
+      {id:uid(),title:'评审设计稿 v2',priority:'P2',dueDate:dateOffset(1),completed:false,projectId:'p_sample_2',postponeCount:0,isSample:true,createdAt:Date.now()-86400000},
+      {id:uid(),title:'约团队周会时间',priority:'P3',dueDate:dateOffset(2),completed:false,projectId:null,postponeCount:0,isSample:true,createdAt:Date.now()},
+      {id:uid(),title:'采购办公耗材',priority:'P2',dueDate:dateOffset(-3),completed:false,projectId:null,postponeCount:0,isSample:true,createdAt:Date.now()-86400000*5},
+      {id:uid(),title:'下周提交预算申请',priority:'P1',dueDate:dateOffset(6),completed:false,projectId:'p_sample_3',postponeCount:0,isSample:true,createdAt:Date.now()}
+    ],
+    inspirations:[
+      {id:uid(),content:'把周报模板改成卡片式，信息密度更高，领导一眼能看完',tags:['周报','设计'],isSample:true,createdAt:Date.now()-86400000},
+      {id:uid(),content:'试试用看板视图管理项目阶段：灵感→进行中→卡点→完成',tags:['项目管理','方法'],isSample:true,createdAt:Date.now()-86400000*2},
+      {id:uid(),content:'每周五下午留1小时做复盘，固定成日历日程',tags:['复盘','习惯'],isSample:true,createdAt:Date.now()}
+    ],
+    projects:[
+      {id:'p_sample_1',name:'季度汇报',stage:'数据汇总',nextStep:'整理PPT框架',blocker:'等市场部提供Q3数据',isSample:true,createdAt:Date.now()-86400000*3},
+      {id:'p_sample_2',name:'官网改版',stage:'开发中',nextStep:'周三前端联调',blocker:'',isSample:true,createdAt:Date.now()-86400000*5},
+      {id:'p_sample_3',name:'新员工入职流程优化',stage:'调研中',nextStep:'访谈3位新员工',blocker:'',isSample:true,createdAt:Date.now()-86400000*2}
+    ],
+    meta:{lastOpenDate:t,backupReminderShown:false}
+  };
+}
+
+function load(){
+  try{
+    const raw = localStorage.getItem(DB_KEY);
+    if(raw){
+      data = JSON.parse(raw);
+      if(!data.meta) data.meta = {};
+    }else{
+      data = defaultData();
+      save();
+    }
+  }catch(e){
+    data = defaultData();
+  }
+  // 字段补全
+  data.todos.forEach(t=>{
+    if(t.postponeCount===undefined) t.postponeCount=0;
+    if(t.projectId===undefined) t.projectId=null;
+  });
+}
+function save(){
+  try{localStorage.setItem(DB_KEY,JSON.stringify(data));}
+  catch(e){toast('保存失败：存储空间不足，建议导出备份后清理','error');}
+}
+
+/* ============ 自动顺延：逾期未完成任务挪到今天 ============ */
+function autoPostpone(){
+  const today = todayStr();
+  let changed = false;
+  data.todos.forEach(t=>{
+    if(!t.completed && t.dueDate && t.dueDate < today){
+      t.dueDate = today;
+      t.postponeCount = (t.postponeCount||0)+1;
+      t.autoPostponed = true;
+      changed = true;
+    }
+  });
+  if(changed) save();
+}
+
+/* ============ 导航切换 ============ */
+function switchSection(name){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('section-'+name).classList.add('active');
+  document.querySelectorAll('.nav-item[data-section]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.section===name);
+  });
+  document.querySelectorAll('.mobile-nav button[data-section]').forEach(b=>{
+    b.classList.toggle('active', b.dataset.section===name);
+  });
+  if(name==='review') renderReview();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ============ 顶部今天要处理 ============ */
+function renderTopAlert(){
+  const today = todayStr();
+  const overdue = data.todos.filter(t=>!t.completed && t.autoPostponed);
+  const blockedProjects = data.projects.filter(p=>p.blocker && p.blocker.trim());
+  const box = document.getElementById('topAlert');
+  box.classList.toggle('has-issue', overdue.length>0 || blockedProjects.length>0);
+
+  let html = '<div class="top-alert-title"><span class="dot"></span> 今天要处理</div>';
+  if(overdue.length===0 && blockedProjects.length===0){
+    html += '<div class="top-alert-empty"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg> 一切就绪，今天没有逾期或卡点</div>';
+  }else{
+    html += '<div class="alert-list">';
+    overdue.forEach(t=>{
+      const proj = t.projectId ? data.projects.find(p=>p.id===t.projectId) : null;
+      html += `<div class="alert-item">
+        <span class="alert-item-tag">逾期顺延</span>
+        <div class="alert-item-text">${escapeHtml(t.title)}${proj?'<span class="sub"> · '+escapeHtml(proj.name)+'</span>':''}<span class="sub"> · 已顺延 ${t.postponeCount} 次</span></div>
+        <button class="alert-item-btn" onclick="postponeTodo('${t.id}',1);renderTopAlert();renderTodos();">再延到明天</button>
+      </div>`;
+    });
+    blockedProjects.forEach(p=>{
+      const linked = data.todos.filter(t=>t.projectId===p.id && !t.completed).length;
+      html += `<div class="alert-item warn">
+        <span class="alert-item-tag">项目卡点</span>
+        <div class="alert-item-text">${escapeHtml(p.name)}<span class="sub"> · ${escapeHtml(p.blocker)}${linked?' · '+linked+'项关联待办':''}</span></div>
+        <button class="alert-item-btn" onclick="switchSection('project')">去处理</button>
+      </div>`;
+    });
+    html += '</div>';
+  }
+  box.innerHTML = html;
+
+  // nav badges
+  const todoOverdue = data.todos.filter(t=>!t.completed && t.autoPostponed).length;
+  const tb = document.getElementById('navTodoBadge');
+  if(todoOverdue>0){tb.textContent=todoOverdue;tb.style.display='inline-block';tb.style.background='var(--danger)';}
+  else{tb.style.display='none';}
+
+  const pb = document.getElementById('navProjBadge');
+  const blocked = data.projects.filter(p=>p.blocker && p.blocker.trim()).length;
+  if(blocked>0){pb.textContent=blocked;pb.style.display='inline-block';}
+  else{pb.style.display='none';}
+}
+
+/* ============ 备份提醒 ============ */
+function checkBackupReminder(){
+  const total = data.todos.length + data.inspirations.length + data.projects.length;
+  const box = document.getElementById('backupReminder');
+  if(total>=20 && !data.meta.backupReminderShown){
+    box.style.display='block';
+    box.className='backup-reminder';
+    box.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 9v4M12 17h.01M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      数据已积累 <b>${total}</b> 条，建议导出一次备份，避免清浏览器时丢失。
+      <button class="btn btn-sm btn-primary" onclick="exportJSON();data.meta.backupReminderShown=true;save();document.getElementById('backupReminder').style.display='none';">立即导出</button>`;
+  }else{
+    box.style.display='none';
+  }
+}
+
+/* ============ 待办 ============ */
+function refreshProjectSelect(){
+  const sel = document.getElementById('todoProject');
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">不关联</option>'+data.projects.map(p=>`<option value="${p.id}">${escapeHtml(p.name)}</option>`).join('');
+  if(cur) sel.value = cur;
+}
+
+function addTodo(){
+  const title = document.getElementById('todoInput').value.trim();
+  if(!title){toast('请填写任务内容','error');return;}
+  const priority = document.getElementById('todoPriority').value;
+  const dueDate = document.getElementById('todoDue').value || todayStr();
+  const projectId = document.getElementById('todoProject').value || null;
+  data.todos.unshift({
+    id:uid(),title,priority,dueDate,completed:false,
+    projectId,postponeCount:0,createdAt:Date.now()
+  });
+  save();
+  document.getElementById('todoInput').value='';
+  document.getElementById('todoDue').value='';
+  renderAll();
+  toast('已添加','success');
+}
+
+function toggleTodo(id){
+  const t = data.todos.find(x=>x.id===id);
+  if(!t) return;
+  t.completed = !t.completed;
+  t.completedDate = t.completed ? Date.now() : null;
+  save();
+  renderAll();
+}
+
+function postponeTodo(id,days){
+  const t = data.todos.find(x=>x.id===id);
+  if(!t) return;
+  t.dueDate = dateOffset(days);
+  t.postponeCount = (t.postponeCount||0)+1;
+  t.autoPostponed = false;
+  save();
+  renderAll();
+  toast('已顺延到'+fmtDate(t.dueDate),'success');
+}
+
+function deleteTodo(id){
+  data.todos = data.todos.filter(t=>t.id!==id);
+  save();
+  renderAll();
+  toast('已删除','success');
+}
+
+function renderTodos(){
+  const today = todayStr();
+  const groups = {
+    overdue:{label:'逾期顺延',cls:'gtag-overdue',items:[]},
+    today:{label:'今天',cls:'gtag-today',items:[]},
+    tomorrow:{label:'明天',cls:'gtag-tomorrow',items:[]},
+    week:{label:'本周内',cls:'gtag-week',items:[]},
+    future:{label:'更远',cls:'gtag-future',items:[]}
+  };
+  // 未完成按日期分组
+  data.todos.filter(t=>!t.completed).forEach(t=>{
+    if(t.autoPostponed) groups.overdue.items.push(t);
+    else if(t.dueDate<=today) groups.today.items.push(t);
+    else if(t.dueDate===dateOffset(1)) groups.tomorrow.items.push(t);
+    else if(t.dueDate<=dateOffset(7)) groups.week.items.push(t);
+    else groups.future.items.push(t);
+  });
+  // 排序：组内按优先级+日期
+  const pOrder={P0:0,P1:1,P2:2,P3:3};
+  Object.values(groups).forEach(g=>g.items.sort((a,b)=>pOrder[a.priority]-pOrder[b.priority] || a.dueDate.localeCompare(b.dueDate)));
+
+  // 已完成（最近7天）
+  const done = data.todos.filter(t=>t.completed && t.completedDate && (Date.now()-t.completedDate)<86400000*7)
+    .sort((a,b)=>b.completedDate-a.completedDate);
+
+  const container = document.getElementById('todoList');
+  let html = '';
+  const order=['overdue','today','tomorrow','week','future'];
+  order.forEach(k=>{
+    const g=groups[k];
+    if(g.items.length===0) return;
+    html += `<div class="todo-group">
+      <div class="todo-group-head"><span class="gtag ${g.cls}">${g.label}</span><span class="gcount">${g.items.length} 项</span></div>`;
+    g.items.forEach(t=>{
+      const proj = t.projectId ? data.projects.find(p=>p.id===t.projectId) : null;
+      const postInfo = t.postponeCount>0 ? `<span class="meta-text ${t.autoPostponed?'warn':''}">已顺延${t.postponeCount}次</span>` : '';
+      html += `<div class="todo-item ${t.autoPostponed?'postponed':''}">
+        <button class="check-btn" onclick="toggleTodo('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="todo-main">
+          <div class="todo-title">${escapeHtml(t.title)}</div>
+          <div class="todo-meta">
+            <span class="pchip pchip-${t.priority}">${t.priority}</span>
+            <span class="meta-text">${fmtDate(t.dueDate)}</span>
+            ${postInfo}
+            ${proj?`<span class="proj-link">${escapeHtml(proj.name)}</span>`:''}
+          </div>
+        </div>
+        <div class="todo-actions">
+          <button class="btn-icon btn-ghost" title="顺延到明天" onclick="postponeTodo('${t.id}',1)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <button class="btn-icon btn-ghost" title="删除" onclick="deleteTodo('${t.id}')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  });
+
+  if(done.length>0){
+    html += `<div class="todo-group">
+      <div class="todo-group-head"><span class="gtag" style="background:var(--success);color:#fff;">最近完成</span><span class="gcount">${done.length} 项</span></div>`;
+    done.forEach(t=>{
+      const proj = t.projectId ? data.projects.find(p=>p.id===t.projectId) : null;
+      html += `<div class="todo-item done">
+        <button class="check-btn" onclick="toggleTodo('${t.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <div class="todo-main">
+          <div class="todo-title">${escapeHtml(t.title)}</div>
+          <div class="todo-meta">
+            <span class="pchip pchip-${t.priority}" style="opacity:.7;">${t.priority}</span>
+            ${proj?`<span class="proj-link">${escapeHtml(proj.name)}</span>`:''}
+            <span class="meta-text">完成于 ${fmtDateTime(t.completedDate)}</span>
+          </div>
+        </div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  if(html===''){
+    html = '<div class="card todo-empty">还没有任务，添加第一条待办开始吧 ✎</div>';
+  }
+  container.innerHTML = html;
+}
+
+/* ============ 灵感 ============ */
+function addInspiration(){
+  const content = document.getElementById('inspInput').value.trim();
+  if(!content){toast('请输入内容','error');return;}
+  const tagsRaw = document.getElementById('inspTags').value.trim();
+  const tags = tagsRaw ? tagsRaw.split(/[,，、\s]+/).filter(Boolean) : [];
+  data.inspirations.unshift({id:uid(),content,tags,createdAt:Date.now()});
+  save();
+  document.getElementById('inspInput').value='';
+  document.getElementById('inspTags').value='';
+  renderAll();
+  toast('已记下','success');
+}
+
+function deleteInspiration(id){
+  data.inspirations = data.inspirations.filter(i=>i.id!==id);
+  save();
+  renderAll();
+  toast('已删除','success');
+}
+
+function renderInspirations(){
+  // tag filter
+  const tagSet = {};
+  data.inspirations.forEach(i=>(i.tags||[]).forEach(t=>tagSet[t]=(tagSet[t]||0)+1));
+  const tags = Object.keys(tagSet).sort((a,b)=>tagSet[b]-tagSet[a]);
+  const filterBox = document.getElementById('tagFilter');
+  let fhtml = `<button class="tag-filter-item ${!currentTagFilter?'active':''}" onclick="setTagFilter(null)">全部 ${data.inspirations.length}</button>`;
+  tags.forEach(t=>{
+    fhtml += `<button class="tag-filter-item ${currentTagFilter===t?'active':''}" onclick="setTagFilter('${escapeAttr(t)}')">${escapeHtml(t)} ${tagSet[t]}</button>`;
+  });
+  filterBox.innerHTML = fhtml;
+
+  const list = document.getElementById('inspList');
+  const items = data.inspirations.filter(i=>!currentTagFilter || (i.tags||[]).includes(currentTagFilter));
+  if(items.length===0){
+    list.innerHTML = '<div class="card todo-empty" style="grid-column:1/-1;">还没有灵感，随手记下第一个想法吧 ✎</div>';
+    return;
+  }
+  list.innerHTML = items.map(i=>{
+    return `<div class="insp-card">
+      <button class="insp-del" onclick="deleteInspiration('${i.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <div class="insp-content">${escapeHtml(i.content)}</div>
+      ${i.tags && i.tags.length?`<div class="insp-tags">${i.tags.map(t=>`<span class="insp-tag" onclick="setTagFilter('${escapeAttr(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`:''}
+      <div class="insp-foot"><span>${fmtDateTime(i.createdAt)}</span></div>
+    </div>`;
+  }).join('');
+}
+
+function setTagFilter(t){
+  currentTagFilter = t;
+  renderInspirations();
+}
+
+/* ============ 项目 ============ */
+function openProjectModal(id){
+  const p = id ? data.projects.find(x=>x.id===id) : null;
+  showModal(`
+    <h3>${p?'编辑项目':'新建项目'}</h3>
+    <p>记录项目当前阶段、下一步动作和卡点。卡点会显示在工作台顶部提醒区。</p>
+    <div class="form-field" style="margin-bottom:10px;"><label>项目名称</label><input type="text" id="pName" value="${p?escapeAttr(p.name):''}" placeholder="例如：官网改版"></div>
+    <div class="form-field" style="margin-bottom:10px;"><label>当前阶段</label><input type="text" id="pStage" value="${p?escapeAttr(p.stage):''}" placeholder="例如：开发中"></div>
+    <div class="form-field" style="margin-bottom:10px;"><label>下一步做什么</label><input type="text" id="pNext" value="${p?escapeAttr(p.nextStep):''}" placeholder="例如：周三前端联调"></div>
+    <div class="form-field" style="margin-bottom:10px;"><label>卡在哪里（留空表示无卡点）</label><input type="text" id="pBlock" value="${p?escapeAttr(p.blocker||''):''}" placeholder="例如：等设计稿确认"></div>
+    <div class="modal-actions">
+      ${p?`<button class="btn btn-danger" onclick="deleteProject('${p.id}')">删除</button>`:''}
+      <button class="btn btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn btn-primary" onclick="saveProject(${p?`'${p.id}'`:'null'})">保存</button>
+    </div>
+  `);
+}
+
+function saveProject(id){
+  const name = document.getElementById('pName').value.trim();
+  if(!name){toast('请填写项目名称','error');return;}
+  const stage = document.getElementById('pStage').value.trim();
+  const nextStep = document.getElementById('pNext').value.trim();
+  const blocker = document.getElementById('pBlock').value.trim();
+  if(id){
+    const p = data.projects.find(x=>x.id===id);
+    if(p){p.name=name;p.stage=stage;p.nextStep=nextStep;p.blocker=blocker;}
+  }else{
+    data.projects.unshift({id:uid(),name,stage,nextStep,blocker,createdAt:Date.now()});
+  }
+  save();
+  closeModal();
+  renderAll();
+  toast('已保存','success');
+}
+
+function deleteProject(id){
+  closeModal();
+  showConfirm('删除项目','删除后该项目下关联的待办不会被删除，但会失去项目关联。确认删除？',()=>{
+    // 解除待办关联
+    data.todos.forEach(t=>{if(t.projectId===id) t.projectId=null;});
+    data.projects = data.projects.filter(p=>p.id!==id);
+    save();
+    renderAll();
+    toast('已删除','success');
+  });
+}
+
+function renderProjects(){
+  const list = document.getElementById('projList');
+  if(data.projects.length===0){
+    list.innerHTML = '<div class="card todo-empty">还没有项目，点击右上角「新建项目」开始跟进 ✎</div>';
+    return;
+  }
+  list.innerHTML = data.projects.map(p=>{
+    const linked = data.todos.filter(t=>t.projectId===p.id);
+    const done = linked.filter(t=>t.completed).length;
+    const total = linked.length;
+    const pct = total>0 ? Math.round(done/total*100) : 0;
+    const blocked = p.blocker && p.blocker.trim();
+    return `<div class="proj-card ${blocked?'blocked':''}">
+      <div class="proj-head">
+        <div>
+          <div class="proj-name">${escapeHtml(p.name)}</div>
+          ${p.stage?`<span class="proj-stage">${escapeHtml(p.stage)}</span>`:''}
+        </div>
+        <button class="btn-icon btn-ghost" onclick="openProjectModal('${p.id}')">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7M18.5 2.5a2.1 2.1 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+      ${p.nextStep?`<div class="proj-row"><div class="lbl">下一步</div>${escapeHtml(p.nextStep)}</div>`:''}
+      ${blocked?`<div class="proj-block"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01" stroke-linecap="round" stroke-linejoin="round"/></svg><div>${escapeHtml(p.blocker)}</div></div>`:''}
+      <div class="proj-progress">
+        <div class="proj-progress-head"><span>关联待办进度</span><span>${done}/${total} · ${pct}%</span></div>
+        <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
+      </div>
+      ${total>0?`<div class="proj-todos">${linked.slice(0,5).map(t=>`<div class="proj-todo-mini ${t.completed?'done':''}"><span class="mini-check"></span><span>${escapeHtml(t.title)}</span></div>`).join('')}${total>5?`<div style="font-size:11px;color:var(--muted);padding:3px 0;">还有 ${total-5} 项…</div>`:''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+/* ============ 每周复盘 ============ */
+function renderReview(){
+  const now = new Date();
+  const dayOfWeek = (now.getDay()+6)%7; // 周一=0
+  const monday = new Date(now);
+  monday.setDate(now.getDate()-dayOfWeek);
+  monday.setHours(0,0,0,0);
+  const mondayStr = monday.getFullYear()+'-'+String(monday.getMonth()+1).padStart(2,'0')+'-'+String(monday.getDate()).padStart(2,'0');
+
+  const weekDone = data.todos.filter(t=>t.completed && t.completedDate && t.completedDate>=monday.getTime());
+  const weekDoneCount = weekDone.length;
+  const todayCount = weekDone.filter(t=>{
+    const d=new Date(t.completedDate);return d.toDateString()===now.toDateString();
+  }).length;
+
+  // 优先级分布
+  const pCount={P0:0,P1:0,P2:0,P3:0};
+  weekDone.forEach(t=>pCount[t.priority]=(pCount[t.priority]||0)+1);
+
+  // 精力分布（按项目）
+  const projEffort={};
+  weekDone.forEach(t=>{
+    if(t.projectId){
+      const p=data.projects.find(x=>x.id===t.projectId);
+      if(p) projEffort[p.name]=(projEffort[p.name]||0)+1;
+    }
+  });
+  // 未关联归为"独立任务"
+  const independent = weekDone.filter(t=>!t.projectId).length;
+  if(independent>0) projEffort['独立任务']=independent;
+
+  // 卡点汇总
+  const blockers = data.projects.filter(p=>p.blocker && p.blocker.trim());
+
+  // 每日完成趋势（周一到今天）
+  const dailyLabels=[];
+  const dailyValues=[];
+  for(let i=0;i<=dayOfWeek;i++){
+    const d=new Date(monday);d.setDate(monday.getDate()+i);
+    const ds=d.toDateString();
+    dailyLabels.push(['周一','周二','周三','周四','周五','周六','周日'][i]);
+    dailyValues.push(weekDone.filter(t=>new Date(t.completedDate).toDateString()===ds).length);
+  }
+
+  let html = '<div class="review-grid">';
+  html += statCard('本周完成','accent',weekDoneCount,'件任务已完成');
+  html += statCard('今日完成','',todayCount,'件今天完成');
+  html += statCard('待办总数','',data.todos.filter(t=>!t.completed).length,'件未完成');
+  html += statCard('项目卡点','',blockers.length,'个项目受阻',blockers.length>0);
+  html += '</div>';
+
+  // 图表区
+  html += '<div class="review-charts">';
+  // 优先级饼图
+  html += '<div class="chart-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-9-9M12 3a9 9 0 0 1 9 9h-9V3z" stroke-linecap="round" stroke-linejoin="round"/></svg> 完成任务优先级分布</h3>';
+  if(weekDoneCount===0){
+    html += '<div class="chart-empty">本周暂无完成数据</div>';
+  }else{
+    html += '<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">';
+    html += drawPie(pCount,['#dc2626','#ea580c','#0891b2','#64748b'],['P0 紧急','P1 重要','P2 一般','P3 低']);
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // 精力分布柱状图
+  html += '<div class="chart-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 精力花在哪些项目</h3>';
+  const projEntries = Object.entries(projEffort).sort((a,b)=>b[1]-a[1]);
+  if(projEntries.length===0){
+    html += '<div class="chart-empty">本周暂无完成数据</div>';
+  }else{
+    const maxV = Math.max(...projEntries.map(e=>e[1]));
+    projEntries.forEach(([name,v])=>{
+      html += `<div class="bar-row"><div class="bname" title="${escapeAttr(name)}">${escapeHtml(name)}</div><div class="bar-track"><div class="bar-fill" style="width:${maxV>0?Math.round(v/maxV*100):0}%;"></div></div><div class="bval">${v}</div></div>`;
+    });
+  }
+  html += '</div></div>';
+
+  // 每日趋势折线图
+  html += '<div class="chart-card" style="margin-bottom:14px;"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18M7 14l3-3 3 3 5-6" stroke-linecap="round" stroke-linejoin="round"/></svg> 本周每日完成趋势</h3>';
+  if(weekDoneCount===0){
+    html += '<div class="chart-empty">本周暂无完成数据</div>';
+  }else{
+    html += drawLine(dailyLabels,dailyValues);
+  }
+  html += '</div>';
+
+  // 卡点汇总
+  html += '<div class="chart-card"><h3><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.3 3.9L1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0zM12 9v4M12 17h.01" stroke-linecap="round" stroke-linejoin="round"/></svg> 卡点汇总</h3>';
+  if(blockers.length===0){
+    html += '<div class="chart-empty" style="color:var(--success);">当前没有卡点，状态良好</div>';
+  }else{
+    html += '<div class="blocker-list">';
+    blockers.forEach(p=>{
+      const linked = data.todos.filter(t=>t.projectId===p.id && !t.completed).length;
+      html += `<div class="blocker-item"><div class="b-title">${escapeHtml(p.name)}${linked?` · ${linked}项待办受影响`:''}</div><div class="b-desc">${escapeHtml(p.blocker)}</div></div>`;
+    });
+    html += '</div>';
+  }
+  html += '</div>';
+
+  document.getElementById('reviewContent').innerHTML = html;
+}
+
+function statCard(label,cls,num,sub,danger){
+  return `<div class="stat-card ${cls||''}" ${danger?'style="border-left:4px solid var(--danger);"':''}>
+    <div class="stat-label">${label}</div>
+    <div class="stat-num">${num}</div>
+    <div class="stat-sub">${sub}</div>
+  </div>`;
+}
+
+/* ============ 内联SVG图表 ============ */
+function drawPie(data,colors,labels){
+  const total = Object.values(data).reduce((a,b)=>a+b,0);
+  const cx=70,cy=70,r=55;
+  if(total===0) return '<svg width="140" height="140"></svg>';
+  let acc=-Math.PI/2;
+  let paths='';
+  const legend=[];
+  let allColors=colors,allLabels=labels;
+  const keys=['P0','P1','P2','P3'];
+  keys.forEach((k,i)=>{
+    const v=data[k]||0;
+    if(v===0) return;
+    const angle = v/total*Math.PI*2;
+    const start=acc, end=acc+angle;
+    const x1=cx+r*Math.cos(start), y1=cy+r*Math.sin(start);
+    const x2=cx+r*Math.cos(end), y2=cy+r*Math.sin(end);
+    const large = angle>Math.PI?1:0;
+    paths += `<path d="M ${cx} ${cy} L ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${large} 1 ${x2.toFixed(2)} ${y2.toFixed(2)} Z" fill="${colors[i]}" stroke="#fff" stroke-width="2"/>`;
+    acc=end;
+    legend.push({name:labels[i],val:v,color:colors[i]});
+  });
+  return `<svg width="140" height="140" viewBox="0 0 140 140" style="flex-shrink:0;">${paths}<circle cx="${cx}" cy="${cy}" r="22" fill="#fff"/><text x="${cx}" y="${cy-3}" text-anchor="middle" font-size="18" font-weight="700" fill="#1e293b">${total}</text><text x="${cx}" y="${cy+12}" text-anchor="middle" font-size="9" fill="#64748b">总数</text></svg>
+    <div class="legend" style="flex:1;min-width:120px;">${legend.map(l=>`<div class="legend-item"><span class="legend-dot" style="background:${l.color};"></span><span class="lname">${l.name}</span><span class="lval">${l.val} 件 · ${Math.round(l.val/total*100)}%</span></div>`).join('')}</div>`;
+}
+
+function drawLine(labels,values){
+  const W=560,H=180,padL=36,padR=16,padT=20,padB=30;
+  const maxV=Math.max(1,...values);
+  const innerW=W-padL-padR, innerH=H-padT-padB;
+  const step = labels.length>1 ? innerW/(labels.length-1) : 0;
+  const pts = values.map((v,i)=>[padL+i*step, padT+innerH-(v/maxV)*innerH]);
+  const linePath = pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+  const areaPath = linePath + ` L ${padL+(labels.length-1)*step} ${padT+innerH} L ${padL} ${padT+innerH} Z`;
+  const gridLines=[0,0.5,1].map(f=>{
+    const y=padT+innerH-f*innerH;
+    return `<line x1="${padL}" y1="${y}" x2="${W-padR}" y2="${y}" stroke="#f1f5f9" stroke-width="1"/>`;
+  }).join('');
+  const dots = pts.map(p=>`<circle cx="${p[0].toFixed(1)}" cy="${p[1].toFixed(1)}" r="4" fill="#0d9488" stroke="#fff" stroke-width="2"/>`).join('');
+  const vlabels = pts.map((p,i)=>`<text x="${p[0].toFixed(1)}" y="${(p[1]-10).toFixed(1)}" text-anchor="middle" font-size="11" font-weight="600" fill="#0f766e">${values[i]}</text>`).join('');
+  const xlabels = labels.map((l,i)=>`<text x="${(padL+i*step).toFixed(1)}" y="${H-8}" text-anchor="middle" font-size="11" fill="#64748b">${l}</text>`).join('');
+  const ylabels = [0,Math.ceil(maxV/2),maxV].map((v,f)=>{
+    const y=padT+innerH-f*innerH;
+    return `<text x="${padL-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="10" fill="#94a3b8">${Math.round(v)}</text>`;
+  }).join('');
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;max-width:560px;">${gridLines}${ylabels}<path d="${areaPath}" fill="#0d9488" opacity="0.1"/><path d="${linePath}" fill="none" stroke="#0d9488" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>${dots}${vlabels}${xlabels}</svg>`;
+}
+
+/* ============ 导入导出 ============ */
+function exportJSON(){
+  const blob = new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href=url;
+  a.download = '办公工作台备份_'+todayStr()+'.json';
+  a.click();
+  URL.revokeObjectURL(url);
+  data.meta.backupReminderShown = true;
+  save();
+  checkBackupReminder();
+  toast('已导出 '+data.todos.length+' 条待办 + '+data.inspirations.length+' 条灵感 + '+data.projects.length+' 个项目','success');
+}
+
+function importJSON(event){
+  const file = event.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    try{
+      const imported = JSON.parse(e.target.result);
+      if(!imported.todos || !imported.inspirations || !imported.projects){
+        throw new Error('文件格式不正确');
+      }
+      showConfirm('导入数据','导入将覆盖当前所有数据，且不可恢复。建议先导出当前数据备份。确认导入？',()=>{
+        data = imported;
+        if(!data.meta) data.meta={};
+        data.meta.backupReminderShown = false;
+        save();
+        renderAll();
+        toast('已导入 '+data.todos.length+' 条待办 + '+data.inspirations.length+' 条灵感 + '+data.projects.length+' 个项目','success');
+      });
+    }catch(err){
+      toast('导入失败：'+err.message,'error');
+    }
+    event.target.value='';
+  };
+  reader.readAsText(file);
+}
+
+/* ============ 清空 ============ */
+function confirmClearAll(){
+  showConfirm('清空全部数据','<b style="color:var(--danger);">此操作不可恢复！</b> 所有待办、灵感、项目都将被永久删除。建议先导出备份。确认清空？',()=>{
+    data = {todos:[],inspirations:[],projects:[],meta:{lastOpenDate:todayStr(),backupReminderShown:false}};
+    save();
+    renderAll();
+    toast('已清空全部数据','success');
+  });
+}
+
+function confirmClearSample(){
+  const sampleCount = data.todos.filter(t=>t.isSample).length + data.inspirations.filter(t=>t.isSample).length + data.projects.filter(t=>t.isSample).length;
+  if(sampleCount===0){toast('没有示例数据','error');return;}
+  showConfirm('清空示例数据','将删除 '+sampleCount+' 条预置示例数据，你自己添加的内容不受影响。确认？',()=>{
+    data.todos = data.todos.filter(t=>!t.isSample);
+    data.inspirations = data.inspirations.filter(t=>!t.isSample);
+    data.projects = data.projects.filter(t=>!t.isSample);
+    save();
+    renderAll();
+    toast('已清空示例数据','success');
+  });
+}
+
+function restoreSample(){
+  const d = defaultData();
+  // 用新id避免冲突
+  const idMap={};
+  d.projects.forEach(p=>{const nid=uid();idMap[p.id]=nid;p.id=nid;p.isSample=true;});
+  d.todos.forEach(t=>{
+    if(t.projectId && idMap[t.projectId]) t.projectId=idMap[t.projectId];
+    t.id=uid();t.isSample=true;
+  });
+  d.inspirations.forEach(i=>{i.id=uid();i.isSample=true;});
+  data.projects = d.projects.concat(data.projects);
+  data.todos = d.todos.concat(data.todos);
+  data.inspirations = d.inspirations.concat(data.inspirations);
+  save();
+  renderAll();
+  toast('已恢复示例数据','success');
+}
+
+/* ============ 模态框 ============ */
+function showModal(html){
+  document.getElementById('modalBox').innerHTML = html;
+  document.getElementById('modalMask').classList.add('show');
+}
+function closeModal(){
+  document.getElementById('modalMask').classList.remove('show');
+}
+function showConfirm(title,msg,onOk){
+  showModal(`<h3>${title}</h3><p>${msg}</p><div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-danger" id="confirmOkBtn">确认</button></div>`);
+  document.getElementById('confirmOkBtn').onclick = ()=>{closeModal();onOk();};
+}
+document.getElementById('modalMask').addEventListener('click',e=>{
+  if(e.target.id==='modalMask') closeModal();
+});
+
+/* ============ Toast ============ */
+let toastTimer=null;
+function toast(msg,type){
+  const el=document.getElementById('toast');
+  el.textContent=msg;
+  el.className='toast show '+(type||'');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>el.classList.remove('show'),2600);
+}
+
+/* ============ 工具 ============ */
+function escapeHtml(s){
+  if(s==null) return '';
+  return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function escapeAttr(s){return escapeHtml(s).replace(/'/g,'&#39;');}
+
+/* ============ 渲染汇总 ============ */
+function renderAll(){
+  refreshProjectSelect();
+  renderTopAlert();
+  renderTodos();
+  renderInspirations();
+  renderProjects();
+  if(document.getElementById('section-review').classList.contains('active')) renderReview();
+  checkBackupReminder();
+}
+
+/* ============ 初始化 ============ */
+function init(){
+  load();
+  // 首次访问或跨天时执行自动顺延
+  const today = todayStr();
+  if(data.meta.lastOpenDate !== today){
+    autoPostpone();
+    data.meta.lastOpenDate = today;
+    save();
+  }else{
+    // 同一天也检查一次（防止打开后过夜）
+    autoPostpone();
+  }
+  // 设置默认截止日期为今天
+  document.getElementById('todoDue').value = todayStr();
+  renderAll();
+}
+init();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  window.addEventListener('load',function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
