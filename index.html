@@ -387,6 +387,22 @@
 .splash-inner{text-align:center;}
 .splash-title{font-size:22px;font-weight:700;color:#1A1A1A;margin-top:16px;font-family:Georgia,"Times New Roman","Songti SC",serif;letter-spacing:.5px;}
 .splash-sub{font-size:12px;color:#6B6B6B;margin-top:4px;}
+/* ===== AI 助手 ===== */
+.ai-action-btn{font-size:11px;padding:5px 10px;border-radius:7px;border:1px solid var(--border);background:#fff;color:var(--primary-dark);font-weight:600;min-height:30px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;transition:all .15s;}
+.ai-action-btn:hover{background:var(--primary-light);border-color:var(--primary);}
+.ai-action-btn:disabled{opacity:.6;cursor:wait;}
+.ai-action-btn svg{width:13px;height:13px;}
+.ai-result{font-size:13.5px;line-height:1.75;color:var(--text);white-space:pre-wrap;word-break:break-word;max-height:55vh;overflow-y:auto;padding:4px 2px;}
+.ai-loading-dots{display:inline-flex;gap:4px;align-items:center;}
+.ai-loading-dots span{width:6px;height:6px;border-radius:50%;background:var(--primary);animation:aidot 1.2s infinite ease-in-out both;}
+.ai-loading-dots span:nth-child(2){animation-delay:.15s;}
+.ai-loading-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes aidot{0%,80%,100%{opacity:.3;transform:scale(.7);}40%{opacity:1;transform:scale(1);}}
+.ai-status{font-size:12px;padding:7px 10px;border-radius:6px;margin-top:8px;display:none;}
+.ai-status.show{display:block;}
+.ai-status.ok{background:#E8F5EC;color:#2D6A3F;}
+.ai-status.err{background:var(--danger-bg);color:var(--danger);}
+.modal .ai-note{font-size:11px;color:var(--muted);margin-top:10px;line-height:1.5;}
 </style>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" type="image/svg+xml" href="icon.svg">
@@ -469,6 +485,10 @@
       每周复盘
     </button>
     <div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--border);">
+      <button class="nav-item" onclick="openAISettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a3 3 0 0 0-3 3v1a3 3 0 0 0-3 3H5a2 2 0 0 0 0 4 2 2 0 0 0 0 4 2 2 0 0 0 0 4h1a3 3 0 0 0 3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0 3-3h1a2 2 0 0 0 0-4 2 2 0 0 0 0-4 2 2 0 0 0 0-4h-1a3 3 0 0 0-3-3V5a3 3 0 0 0-3-3zM9 12h6M9 8h6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        AI 设置
+      </button>
       <button class="nav-item" onclick="confirmClearAll()" style="color:var(--danger);">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg>
         清空数据
@@ -970,7 +990,7 @@ function renderInspirations(){
       <button class="insp-del" onclick="deleteInspiration('${i.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" stroke-linecap="round" stroke-linejoin="round"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <div class="insp-content">${escapeHtml(i.content)}</div>
       ${i.tags && i.tags.length?`<div class="insp-tags">${i.tags.map(t=>`<span class="insp-tag" onclick="setTagFilter('${escapeAttr(t)}')">${escapeHtml(t)}</span>`).join('')}</div>`:''}
-      <div class="insp-foot"><span>${fmtDateTime(i.createdAt)}</span></div>
+      <div class="insp-foot"><span>${fmtDateTime(i.createdAt)}</span><button class="ai-action-btn" id="aiInsp-${i.id}" onclick="expandInspiration('${i.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>AI 扩展</button></div>
     </div>`;
   }).join('');
 }
@@ -1056,6 +1076,7 @@ function renderProjects(){
         <div class="proj-progress-head"><span>关联待办进度</span><span>${done}/${total} · ${pct}%</span></div>
         <div class="progress-bar"><div class="progress-fill" style="width:${pct}%;"></div></div>
       </div>
+      <div class="proj-actions">${blocked?`<button class="ai-action-btn" id="aiProj-${p.id}" onclick="suggestProject('${p.id}')"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L9 9H2l5.5 4-2 7L12 16l6.5 4-2-7L22 9h-7z" stroke-linecap="round" stroke-linejoin="round"/></svg>AI 建议</button>`:''}</div>
       ${total>0?`<div class="proj-todos">${linked.slice(0,5).map(t=>`<div class="proj-todo-mini ${t.completed?'done':''}"><span class="mini-check"></span><span>${escapeHtml(t.title)}</span></div>`).join('')}${total>5?`<div style="font-size:11px;color:var(--muted);padding:3px 0;">还有 ${total-5} 项…</div>`:''}</div>`:''}
     </div>`;
   }).join('');
@@ -1347,6 +1368,95 @@ function renderAll(){
 }
 
 /* ============ 初始化 ============ */
+/* ============ AI 助手（DeepSeek） ============ */
+const AI_KEY='wb_office_ai_config';
+function loadAIConfig(){try{return JSON.parse(localStorage.getItem(AI_KEY)||'{}');}catch(e){return {};}}
+function saveAIConfig(cfg){localStorage.setItem(AI_KEY,JSON.stringify(cfg));}
+function openAISettings(){
+  const cfg=loadAIConfig();
+  showModal('<h3>AI 助手设置</h3>'+
+  '<p>填入 DeepSeek API key 后，灵感扩展 / 项目卡点建议 / 待办拆解 / 复盘洞察 等 AI 功能可用。key 只存你浏览器本地，不上传服务器。</p>'+
+  '<div class="form-field" style="margin-bottom:10px;"><label>API Key</label><input type="password" id="aiKey" value="'+escapeAttr(cfg.key||'')+'" placeholder="sk-..."></div>'+
+  '<div class="form-field" style="margin-bottom:10px;"><label>模型</label><select id="aiModel"><option value="deepseek-chat" '+(cfg.model==='deepseek-chat'?'selected':'')+'>deepseek-chat（快，日常用）</option><option value="deepseek-reasoner" '+(cfg.model==='deepseek-reasoner'?'selected':'')+'>deepseek-reasoner（推理强，较慢）</option></select></div>'+
+  '<div class="ai-status" id="aiStatus"></div>'+
+  '<div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">取消</button><button class="btn btn-ghost" onclick="testAIConn()">测试连接</button><button class="btn btn-primary" onclick="saveAIConfigAndClose()">保存</button></div>'+
+  '<div class="ai-note">没有 key？去 platform.deepseek.com 注册（微信扫码登录），在「API keys」创建。新用户有免费额度。<br>提示：key 在浏览器 devtools 可见，单用户自用可接受，请勿在公共电脑保存。</div>');
+}
+function saveAIConfigAndClose(){
+  const key=document.getElementById('aiKey').value.trim();
+  const model=document.getElementById('aiModel').value;
+  saveAIConfig({key,model});
+  closeModal();
+  toast('AI 设置已保存','success');
+}
+async function testAIConn(){
+  const key=document.getElementById('aiKey').value.trim();
+  const model=document.getElementById('aiModel').value;
+  const st=document.getElementById('aiStatus');
+  if(!key){st.className='ai-status err show';st.textContent='请先填 key';return;}
+  st.className='ai-status show';st.textContent='测试中…';
+  try{
+    const r=await callDeepSeek([{role:'user',content:'回复 OK'}],{key,model});
+    st.className='ai-status ok show';st.textContent='✓ 连接成功：'+(r||'').slice(0,30);
+  }catch(e){st.className='ai-status err show';st.textContent='✗ '+e.message;}
+}
+async function callDeepSeek(messages,overrideCfg){
+  const cfg=overrideCfg||loadAIConfig();
+  if(!cfg.key) throw new Error('未配置 API key，请先在「AI 设置」填写');
+  const r=await fetch('https://api.deepseek.com/v1/chat/completions',{
+    method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+cfg.key},
+    body:JSON.stringify({model:cfg.model||'deepseek-chat',messages:messages,stream:false,temperature:0.7})
+  });
+  if(!r.ok){let t='';try{t=await r.text();}catch(e){}throw new Error('API '+r.status+': '+t.slice(0,150));}
+  const d=await r.json();
+  return (d.choices&&d.choices[0]&&d.choices[0].message)?d.choices[0].message.content:'';
+}
+function showAIResult(title,htmlContent,actions){
+  let actionsHtml='';
+  if(actions&&actions.length) actionsHtml='<div class="modal-actions">'+actions.map(function(a){return '<button class="btn '+(a.cls||'btn-ghost')+'" onclick="'+a.onclick+'()">'+a.label+'</button>';}).join('')+'</div>';
+  showModal('<h3>'+title+'</h3><div class="ai-result">'+htmlContent+'</div>'+actionsHtml+'<div class="modal-actions"><button class="btn btn-ghost" onclick="closeModal()">关闭</button></div>');
+}
+function aiLoadingHtml(){return '<span class="ai-loading-dots"><span></span><span></span><span></span></span>';}
+async function runAI(title,prompt,btnId,onDone){
+  const btn=btnId?document.getElementById(btnId):null;
+  if(btn){btn.disabled=true;btn.setAttribute('data-orig',btn.innerHTML);btn.innerHTML=aiLoadingHtml()+' 思考中';}
+  showModal('<h3>'+title+'</h3><div class="ai-result" style="text-align:center;padding:30px;">'+aiLoadingHtml()+'<div style="margin-top:10px;color:var(--muted);font-size:12px;">AI 思考中…</div></div>');
+  try{
+    const txt=await callDeepSeek([{role:'user',content:prompt}]);
+    const html=escapeHtml(txt).replace(/\n/g,'<br>');
+    if(onDone) onDone(txt,html); else showAIResult(title,html);
+  }catch(e){
+    showAIResult(title+' · 出错','<span style="color:var(--danger);">'+escapeHtml(e.message)+'</span><br><br>如果是 key 问题，到「AI 设置」检查；如果是网络问题稍后重试。');
+  }finally{
+    if(btn&&btn.getAttribute('data-orig')){btn.disabled=false;btn.innerHTML=btn.getAttribute('data-orig');btn.removeAttribute('data-orig');}
+  }
+}
+/* 灵感 AI 扩展 */
+async function expandInspiration(id){
+  const insp=data.inspirations.find(function(i){return i.id===id;});
+  if(!insp) return;
+  window._aiCtx={type:'insp',content:insp.content,tags:insp.tags||[]};
+  runAI('灵感扩展','你是一位创意顾问。请把下面这条灵感扩展成完整的方案或思路，包含：① 落地步骤 ② 可能的价值 ③ 潜在风险或注意点。用简短分点输出，400字以内。\n\n灵感：'+insp.content,'aiInsp-'+id,function(txt,html){
+    window._aiResult=txt;
+    showAIResult('灵感扩展',html,[{label:'存为新灵感',cls:'btn-primary',onclick:'saveAIAsInspiration'}]);
+  });
+}
+function saveAIAsInspiration(){
+  const ctx=window._aiCtx;
+  if(!ctx||!window._aiResult){closeModal();return;}
+  data.inspirations.unshift({id:uid(),content:'【AI扩展·'+ctx.content.slice(0,16)+'】\n'+window._aiResult,tags:ctx.tags,createdAt:Date.now()});
+  save();renderAll();closeModal();toast('已存为新灵感','success');
+}
+/* 项目卡点 AI 建议 */
+async function suggestProject(id){
+  const p=data.projects.find(function(x){return x.id===id;});
+  if(!p) return;
+  runAI('项目卡点建议','你是一位资深项目管理顾问。请针对以下项目卡点给出突破建议。\n\n项目：'+p.name+'\n当前阶段：'+(p.stage||'未指定')+'\n卡点：'+p.blocker+'\n下一步计划：'+(p.nextStep||'未指定')+'\n\n请给 3-5 条可立即执行的建议，每条含：动作 + 预期效果。简短分点，400字以内。','aiProj-'+p.id,function(txt,html){
+    showAIResult('项目卡点建议',html);
+  });
+}
+
 function init(){
   load();
   // 首次访问或跨天时执行自动顺延
